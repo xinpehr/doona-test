@@ -124,7 +124,7 @@ class Plugin implements PluginInterface
                             ]
                         ]
                     ],
-                    'enabled' => false
+                    'enabled' => true
                 ],
                 // Gen4 Turbo - Fast video generation
                 [
@@ -178,7 +178,7 @@ class Plugin implements PluginInterface
                             ]
                         ]
                     ],
-                    'enabled' => false
+                    'enabled' => true
                 ],
                 // Gen4 Aleph - Highest quality video generation
                 [
@@ -232,7 +232,7 @@ class Plugin implements PluginInterface
                             ]
                         ]
                     ],
-                    'enabled' => false
+                    'enabled' => true
                 ]
             ]
         ];
