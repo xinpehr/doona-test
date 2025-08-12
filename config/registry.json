@@ -4337,7 +4337,7 @@
                             }
                         ]
                     },
-                    "enabled": false
+                    "enabled": true
                 },
                 {
                     "type": "video",
@@ -4411,7 +4411,7 @@
                             }
                         ]
                     },
-                    "enabled": false
+                    "enabled": true
                 },
                 {
                     "type": "video",
@@ -4485,7 +4485,7 @@
                             }
                         ]
                     },
-                    "enabled": false
+                    "enabled": true
                 }
             ]
         }
