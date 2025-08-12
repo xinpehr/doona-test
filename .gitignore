@@ -1,0 +1,192 @@
+# -------------------------------
+# IDE & Editor Files
+# -------------------------------
+*.code-workspace
+**/.idea
+**/.vscode/
+*.swp
+*.swo
+*.bak
+*.tmp
+*~
+.project
+.buildpath
+.settings/
+*.sublime-*
+.tags*
+
+# -------------------------------
+# OS & System Files
+# -------------------------------
+**/.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# -------------------------------
+# Dependency Folders
+# -------------------------------
+/node_modules/
+
+# -------------------------------
+# Logs & Cache
+# -------------------------------
+*.log
+logs/
+error_log
+access_log
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+tmp/
+var/**/*
+!var/cache/
+lscache/
+*.cache
+.cache/
+
+# -------------------------------
+# PHP Development
+# -------------------------------
+# PHPUnit
+/phpunit.xml
+/.phpunit.result.cache
+/coverage/
+coverage/
+*.coverage
+
+# PHP CS Fixer
+.php_cs.cache
+.php-cs-fixer.cache
+
+# PHPStan
+phpstan.phar
+.phpstan.neon
+
+# -------------------------------
+# CPanel & Hosting
+# -------------------------------
+.cpanel/
+.spamassassin/
+.trash/
+.mail/
+.htpasswds
+public_ftp/
+access-logs
+.cagefs/
+.cagefs-*
+.cage/
+.lastlogin
+.lesshst
+.spamassassinboxenable
+.spamassassinenable
+.gemrc
+.gitconfig
+.bash_history
+.bash_logout
+.bash_profile
+.bashrc
+.cloud-locale-test.skip
+.caldav/
+.cl.selector/
+.composer/
+
+
+# -------------------------------
+# AI & Machine Learning
+# -------------------------------
+# Model files and AI cache
+*.pkl
+*.model
+*.onnx
+
+
+# -------------------------------
+# Security & Sensitive Files
+# -------------------------------
+*.pem
+*.key
+*.p12
+*.p8
+*.cer
+*.crt
+.well-known/
+
+# -------------------------------
+# Backup & Archive Files
+# -------------------------------
+*.backup
+*.bak
+*.old
+*.orig
+*.save
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# -------------------------------
+# Runtime & Process Files
+# -------------------------------
+*.pid
+*.seed
+*.pid.lock
+
+# -------------------------------
+# Git Keep Empty Dirs
+# -------------------------------
+!*.gitkeep
+!.gitkeep
+
+# -------------------------------
+# Symlinks
+# -------------------------------
+www
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon files
+Icon?
+._*
+
+# Thumbnails
+Thumbs.db
+ehthumbs.db
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Cache files
+**/.AppleDouble
+**/.DS_Store
+**/__MACOSX/
+
+# macOS swap files
+*.swp
+*.swo
+
+# macOS metadata
+.metadata_never_index
+
+# Node.js & npm directories
+.nvm/
+.npm/
+**/.nvm/
+**/.npm/
+
+.env.git
