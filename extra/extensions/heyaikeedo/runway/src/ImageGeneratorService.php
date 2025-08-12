@@ -49,11 +49,25 @@ class ImageGeneratorService implements ImageServiceInterface
         Model $model,
         ?array $params = null
     ): ImageEntity {
+        error_log("Runway ImageGeneratorService: generateImage called with model: " . $model->value);
+        
         if (!$params || !array_key_exists('prompt', $params)) {
+            error_log("Runway ImageGeneratorService: Missing prompt parameter");
             throw new DomainException('Missing parameter: prompt');
         }
+        
+        error_log("Runway ImageGeneratorService: API Key present: " . ($this->apiKey ? 'Yes' : 'No'));
 
+        $this->parseDirectory();
+        
+        if (!isset($this->models[$model->value])) {
+            error_log("Runway ImageGeneratorService: Model {$model->value} not found in models array");
+            error_log("Runway ImageGeneratorService: Available models: " . json_encode(array_keys($this->models ?? [])));
+            throw new DomainException("Model {$model->value} is not supported");
+        }
+        
         $card = $this->models[$model->value];
+        error_log("Runway ImageGeneratorService: Using model config: " . json_encode($card));
 
         $entity = new ImageEntity(
             $workspace,
