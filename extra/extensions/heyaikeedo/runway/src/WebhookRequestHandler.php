@@ -35,6 +35,7 @@ class WebhookRequestHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        error_log("Runway Webhook: Received request for ID: " . $request->getAttribute('id'));
         $id = $request->getAttribute('id');
 
         // Find library item by id
@@ -57,10 +58,10 @@ class WebhookRequestHandler implements RequestHandlerInterface
             );
         }
 
-        // Validate webhook payload
+        // Validate webhook payload - Runway uses 'id' field for task ID
         if (
-            !isset($data->taskId)
-            || $data->taskId !== $entity->getMeta('runway_task_id')
+            !isset($data->id)
+            || $data->id !== $entity->getMeta('runway_task_id')
         ) {
             throw new HttpException(
                 'Invalid request: Task ID mismatch',
