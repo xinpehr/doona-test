@@ -140,20 +140,32 @@ class ImageGeneratorService implements ImageServiceInterface
             $data[$p['key']] = $params[$p['key']];
         }
 
-        // Send request to Runway API
-        $resp = $this->client->sendRequest(
-            'POST',
-            '/v1/images/generations',
-            $data
-        );
+        try {
+            error_log("Runway ImageGeneratorService: Sending API request with data: " . json_encode($data));
+            
+            // Send request to Runway API
+            $resp = $this->client->sendRequest(
+                'POST',
+                '/v1/images/generations',
+                $data
+            );
 
-        $content = json_decode($resp->getBody()->getContents());
+            error_log("Runway ImageGeneratorService: API response status: " . $resp->getStatusCode());
+            $content = json_decode($resp->getBody()->getContents());
+            error_log("Runway ImageGeneratorService: API response: " . json_encode($content));
 
-        // Store task ID for tracking
-        $entity->addMeta('runway_task_id', $content->id ?? $content->taskId ?? null);
-        $entity->addMeta('runway_model', $model->value);
+            // Store task ID for tracking
+            $entity->addMeta('runway_task_id', $content->id ?? $content->taskId ?? null);
+            $entity->addMeta('runway_model', $model->value);
 
-        return $entity;
+            error_log("Runway ImageGeneratorService: Successfully created entity");
+            return $entity;
+            
+        } catch (\Exception $e) {
+            error_log("Runway ImageGeneratorService: Exception occurred: " . $e->getMessage());
+            error_log("Runway ImageGeneratorService: Exception trace: " . $e->getTraceAsString());
+            throw $e;
+        }
     }
 
     #[Override]
