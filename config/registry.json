@@ -29,8 +29,7 @@
                         "titler": true,
                         "writer": true,
                         "coder": true
-                    },
-                    "enabled": false
+                    }
                 },
                 {
                     "type": "llm",
@@ -4278,6 +4277,7 @@
             "key": "runway",
             "name": "Runway",
             "icon": "/assets/icons/monochrome/runway.svg",
+            "custom": true,
             "models": [
                 {
                     "type": "image",
