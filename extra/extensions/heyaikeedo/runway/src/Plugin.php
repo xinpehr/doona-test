@@ -66,6 +66,21 @@ class Plugin implements PluginInterface
                 break;
             }
         }
+        
+        // If runway provider exists and has custom models, skip adding
+        if ($runwayIndex !== null) {
+            $existingModels = $directory[$runwayIndex]['models'] ?? [];
+            $hasCustomModels = false;
+            foreach ($existingModels as $model) {
+                if (isset($model['custom']) && $model['custom']) {
+                    $hasCustomModels = true;
+                    break;
+                }
+            }
+            if ($hasCustomModels) {
+                return; // Already added
+            }
+        }
 
         // Runway provider configuration
         $runwayProvider = [
