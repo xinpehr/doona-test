@@ -29,7 +29,7 @@
     },
     "extra": {
         "entry-class": "Aikeedo\\Runway\\Plugin",
-        "status": "inactive",
+        "status": "active",
         "title": "Runway API",
         "description": "Advanced AI video and image generation using Runway's cutting-edge models",
         "logo": "https://cdn.aikeedo.com/plugins/runway/logo.svg",
