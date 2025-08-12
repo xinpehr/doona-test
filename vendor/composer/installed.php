@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'heyaikeedo/aikeedo',
-        'pretty_version' => '3.2.x-dev',
-        'version' => '3.2.9999999.9999999-dev',
-        'reference' => '5a3f695905a610526b4463f77ede290bf6d334d4',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '0a6aac17839d147dacdcda62411ca6a43dd1c439',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -380,9 +380,9 @@
             'dev_requirement' => false,
         ),
         'heyaikeedo/aikeedo' => array(
-            'pretty_version' => '3.2.x-dev',
-            'version' => '3.2.9999999.9999999-dev',
-            'reference' => '5a3f695905a610526b4463f77ede290bf6d334d4',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '0a6aac17839d147dacdcda62411ca6a43dd1c439',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -397,10 +397,19 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'heyaikeedo/currency-beacon' => array(
+            'pretty_version' => '1.0.0',
+            'version' => '1.0.0.0',
+            'reference' => null,
+            'type' => 'aikeedo-plugin',
+            'install_path' => __DIR__ . '/../../extra/extensions/heyaikeedo/currency-beacon',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'heyaikeedo/default' => array(
             'pretty_version' => '2.0.1',
             'version' => '2.0.1.0',
-            'reference' => 'e8ee4cfa99343f0780e0202a705fec8edc05a462',
+            'reference' => 'bd5f65c230a2d9c8dd81ca00de0dcdd12c0b1b16',
             'type' => 'aikeedo-theme',
             'install_path' => __DIR__ . '/../../extra/extensions/heyaikeedo/default',
             'aliases' => array(),
@@ -880,8 +889,8 @@
         'psr/http-client-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0',
-                1 => '*',
+                0 => '*',
+                1 => '1.0',
             ),
         ),
         'psr/http-factory' => array(
@@ -896,9 +905,9 @@
         'psr/http-factory-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0',
-                1 => '^1.0',
-                2 => '*',
+                0 => '*',
+                1 => '1.0',
+                2 => '^1.0',
             ),
         ),
         'psr/http-message' => array(
@@ -913,9 +922,9 @@
         'psr/http-message-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0',
-                1 => '^1.1 || ^2.0',
-                2 => '*',
+                0 => '*',
+                1 => '1.0',
+                2 => '^1.1 || ^2.0',
             ),
         ),
         'psr/http-server-handler' => array(
@@ -948,8 +957,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '3.0.0',
-                1 => '1.0|2.0|3.0',
+                0 => '1.0|2.0|3.0',
+                1 => '3.0.0',
             ),
         ),
         'psr/simple-cache' => array(

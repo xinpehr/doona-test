@@ -3208,13 +3208,66 @@
             "install-path": "../heyaikeedo/composer"
         },
         {
+            "name": "heyaikeedo/currency-beacon",
+            "version": "1.0.0",
+            "version_normalized": "1.0.0.0",
+            "dist": {
+                "type": "zip",
+                "url": "extra/artifacts/689ae90762f18.zip",
+                "shasum": "2c3aea16b1a7289e6d628ca442e97ca3e216de17"
+            },
+            "require": {
+                "heyaikeedo/composer": "^1.0.0"
+            },
+            "time": "2024-07-14T00:00:00+00:00",
+            "type": "aikeedo-plugin",
+            "extra": {
+                "entry-class": "Aikeedo\\CurrencyBeacon\\Plugin",
+                "status": "active",
+                "title": "Currency Beacon",
+                "description": "Currency Beacon integration for Aikeedo",
+                "logo": "https://cdn.aikeedo.com/plugins/currency-beacon/logo.svg",
+                "icon": "https://cdn.aikeedo.com/plugins/currency-beacon/icon.svg"
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Aikeedo\\CurrencyBeacon\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aikeedo",
+                    "email": "hey@aikeedo.com",
+                    "homepage": "https://aikeedo.com",
+                    "role": "Owner"
+                }
+            ],
+            "description": "Currency Beacon integration for Aikeedo",
+            "homepage": "https://aikeedo.com",
+            "support": {
+                "chat": "https://aikeedo.com/",
+                "docs": "https://docs.aikeedo.com/",
+                "email": "support@aikeedo.com",
+                "forum": "https://aikeedo.com/",
+                "issues": "https://github.com/heyaikeedo/plugins-currency-beacon/issues",
+                "rss": "https://aikeedo.com/",
+                "source": "https://github.com/heyaikeedo/plugins-currency-beacon",
+                "wiki": "https://docs.aikeedo.com/"
+            },
+            "install-path": "../../extra/extensions/heyaikeedo/currency-beacon"
+        },
+        {
             "name": "heyaikeedo/default",
             "version": "2.0.1",
             "version_normalized": "2.0.1.0",
             "dist": {
                 "type": "path",
                 "url": "extra/extensions/heyaikeedo/default",
-                "reference": "e8ee4cfa99343f0780e0202a705fec8edc05a462"
+                "reference": "bd5f65c230a2d9c8dd81ca00de0dcdd12c0b1b16"
             },
             "require": {
                 "heyaikeedo/composer": "^1.0.0"
@@ -3229,7 +3282,8 @@
                 "public": [
                     "assets",
                     ".vite"
-                ]
+                ],
+                "status": "active"
             },
             "installation-source": "dist",
             "license": [

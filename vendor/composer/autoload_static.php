@@ -233,6 +233,7 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         'A' => 
         array (
             'Aikeedo\\Integrity\\' => 18,
+            'Aikeedo\\CurrencyBeacon\\' => 23,
             'Aikeedo\\Composer\\' => 17,
             'Adbar\\' => 6,
         ),
@@ -425,8 +426,8 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         ),
         'Psr\\Http\\Server\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-server-handler/src',
-            1 => __DIR__ . '/..' . '/psr/http-server-middleware/src',
+            0 => __DIR__ . '/..' . '/psr/http-server-middleware/src',
+            1 => __DIR__ . '/..' . '/psr/http-server-handler/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -599,8 +600,8 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         ),
         'Gettext\\' => 
         array (
-            0 => __DIR__ . '/..' . '/gettext/gettext/src',
-            1 => __DIR__ . '/..' . '/gettext/translator/src',
+            0 => __DIR__ . '/..' . '/gettext/translator/src',
+            1 => __DIR__ . '/..' . '/gettext/gettext/src',
         ),
         'GPBMetadata\\Google\\Type\\' => 
         array (
@@ -785,6 +786,10 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         'Aikeedo\\Integrity\\' => 
         array (
             0 => __DIR__ . '/..' . '/heyaikeedo/integrity/src',
+        ),
+        'Aikeedo\\CurrencyBeacon\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/extra/extensions/heyaikeedo/currency-beacon/src',
         ),
         'Aikeedo\\Composer\\' => 
         array (

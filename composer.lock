@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7a4fa29ceb6674f0c9ec064a8e5cf6d",
+    "content-hash": "1934d7742611150a71dae071aa7d91fa",
     "packages": [
         {
             "name": "adbario/php-dot-notation",
@@ -3088,12 +3088,62 @@
             "time": "2025-03-04T14:23:00+00:00"
         },
         {
+            "name": "heyaikeedo/currency-beacon",
+            "version": "1.0.0",
+            "dist": {
+                "type": "zip",
+                "url": "extra/artifacts/689ae90762f18.zip",
+                "shasum": "2c3aea16b1a7289e6d628ca442e97ca3e216de17"
+            },
+            "require": {
+                "heyaikeedo/composer": "^1.0.0"
+            },
+            "type": "aikeedo-plugin",
+            "extra": {
+                "entry-class": "Aikeedo\\CurrencyBeacon\\Plugin",
+                "status": "active",
+                "title": "Currency Beacon",
+                "description": "Currency Beacon integration for Aikeedo",
+                "logo": "https://cdn.aikeedo.com/plugins/currency-beacon/logo.svg",
+                "icon": "https://cdn.aikeedo.com/plugins/currency-beacon/icon.svg"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Aikeedo\\CurrencyBeacon\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aikeedo",
+                    "email": "hey@aikeedo.com",
+                    "homepage": "https://aikeedo.com",
+                    "role": "Owner"
+                }
+            ],
+            "description": "Currency Beacon integration for Aikeedo",
+            "homepage": "https://aikeedo.com",
+            "support": {
+                "chat": "https://aikeedo.com/",
+                "docs": "https://docs.aikeedo.com/",
+                "email": "support@aikeedo.com",
+                "forum": "https://aikeedo.com/",
+                "issues": "https://github.com/heyaikeedo/plugins-currency-beacon/issues",
+                "rss": "https://aikeedo.com/",
+                "source": "https://github.com/heyaikeedo/plugins-currency-beacon",
+                "wiki": "https://docs.aikeedo.com/"
+            },
+            "time": "2024-07-14T00:00:00+00:00"
+        },
+        {
             "name": "heyaikeedo/default",
             "version": "2.0.1",
             "dist": {
                 "type": "path",
                 "url": "extra/extensions/heyaikeedo/default",
-                "reference": "e8ee4cfa99343f0780e0202a705fec8edc05a462"
+                "reference": "bd5f65c230a2d9c8dd81ca00de0dcdd12c0b1b16"
             },
             "require": {
                 "heyaikeedo/composer": "^1.0.0"
@@ -3107,7 +3157,8 @@
                 "public": [
                     "assets",
                     ".vite"
-                ]
+                ],
+                "status": "active"
             },
             "license": [
                 "AIKEEDO"
@@ -11194,7 +11245,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -11203,6 +11254,6 @@
         "ext-gd": "*",
         "ext-bcmath": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
