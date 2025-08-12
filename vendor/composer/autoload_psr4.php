@@ -141,6 +141,7 @@ return array(
     'Composer\\CaBundle\\' => array($vendorDir . '/composer/ca-bundle/src'),
     'Composer\\' => array($vendorDir . '/composer/composer/src/Composer'),
     'Brick\\Math\\' => array($vendorDir . '/brick/math/src'),
+    'Aikeedo\\Runway\\' => array($baseDir . '/extra/extensions/heyaikeedo/runway/src'),
     'Aikeedo\\Integrity\\' => array($vendorDir . '/heyaikeedo/integrity/src'),
     'Aikeedo\\CurrencyBeacon\\' => array($baseDir . '/extra/extensions/heyaikeedo/currency-beacon/src'),
     'Aikeedo\\Composer\\' => array($vendorDir . '/heyaikeedo/composer/src'),
