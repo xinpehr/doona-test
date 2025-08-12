@@ -41,6 +41,11 @@ class Plugin implements PluginInterface
         // Add path to the router mapper to scan for routes 
         // in current directory
         $this->mapper->addPath(__DIR__);
+        
+        // Register console commands
+        if (php_sapi_name() === 'cli') {
+            // Commands will be auto-discovered by attribute scanning
+        }
 
         // Register Runway AI services
         try {
