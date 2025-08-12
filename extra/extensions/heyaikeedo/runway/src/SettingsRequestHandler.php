@@ -19,7 +19,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * This request handler displays the settings page for the Runway API plugin
  * where administrators can configure their API key and other settings.
  */
-#[Route(path: '/settings/providers/runway', method: RequestMethod::GET)]
+#[Route(path: '/settings/runway', method: RequestMethod::GET)]
 class SettingsRequestHandler extends AbstractAdminViewRequestHandler implements
     RequestHandlerInterface
 {
