@@ -43,9 +43,15 @@ class Plugin implements PluginInterface
         $this->mapper->addPath(__DIR__);
 
         // Register Runway AI services
-        $this->factory
-            ->register(ImageGeneratorService::class)
-            ->register(VideoService::class);
+        try {
+            $this->factory
+                ->register(ImageGeneratorService::class)
+                ->register(VideoService::class);
+            
+            error_log("Runway Plugin: Successfully registered AI services");
+        } catch (\Exception $e) {
+            error_log("Runway Plugin: Failed to register AI services: " . $e->getMessage());
+        }
 
         // Add Runway models to registry
         try {
