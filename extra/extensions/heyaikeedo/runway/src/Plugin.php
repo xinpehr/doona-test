@@ -79,6 +79,7 @@ class Plugin implements PluginInterface
             'key' => 'runway',
             'name' => 'Runway',
             'icon' => '/assets/icons/monochrome/runway.svg',
+            'custom' => true,
             'models' => [
                 // Gen4 Image - Advanced image generation with reference images
                 [
