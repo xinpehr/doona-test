@@ -38,9 +38,7 @@ class Plugin implements PluginInterface
         // the second argument is the namespace to use in the template.
         $this->loader->addPath(__DIR__, 'runway');
 
-        // Add path to the router mapper to scan for routes 
-        // in current directory
-        $this->mapper->addPath(__DIR__);
+        // Note: Settings route is handled by core system at /admin/settings/runway
 
         // Register Runway AI services
         $this->factory
