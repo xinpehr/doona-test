@@ -55,8 +55,21 @@ class TaskStatusRequestHandler implements RequestHandlerInterface
 
         try {
             // Check task status from Runway API
-            $response = $this->client->sendRequest('GET', "/v1/tasks/{$taskId}");
-            $data = json_decode($response->getBody()->getContents(), true);
+            error_log("TaskStatus: Checking task {$taskId} for entity {$entity->getId()}");
+            
+            $response = $this->client->sendRequest(
+                'GET', 
+                "/v1/tasks/{$taskId}",
+                [],
+                [],
+                ['X-Runway-Version' => '2024-11-06']
+            );
+            
+            error_log("TaskStatus: Runway API response status: " . $response->getStatusCode());
+            $responseBody = $response->getBody()->getContents();
+            error_log("TaskStatus: Runway API response: " . $responseBody);
+            
+            $data = json_decode($responseBody, true);
 
             // Process the response using appropriate webhook processor
             if ($entity instanceof ImageEntity) {
