@@ -26,6 +26,11 @@ class Helper
     {
         $protocol = $this->isSecure ? 'https' : 'http';
         $domain = $this->domain;
+        
+        // Fallback to $_SERVER if domain is not configured
+        if (empty($domain)) {
+            $domain = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+        }
 
         return sprintf(
             '%s://%s/webhooks/runway/%s',
