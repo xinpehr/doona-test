@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 
 #[Route(path: '/settings', method: RequestMethod::GET)]
 #[Route(
-    path: '/settings/[general|models|logo|billing|payments|credits|rate-providers|affiliates|openai|cohere|anthropic|xai|ollama|elevenlabs|speechify|falai|luma|stabilityai|gcp|azure|clipdrop|aimlapi|onesignal|serper|searchapi|mail|smtp|policies|accounts|public-details|recaptcha|appearance|pwa|storage|cdn:name]?',
+    path: '/settings/[general|models|logo|billing|payments|credits|rate-providers|affiliates|openai|cohere|anthropic|xai|ollama|elevenlabs|speechify|falai|luma|stabilityai|gcp|azure|clipdrop|aimlapi|runway|onesignal|serper|searchapi|mail|smtp|policies|accounts|public-details|recaptcha|appearance|pwa|storage|cdn:name]?',
     method: RequestMethod::GET
 )]
 #[Route(
