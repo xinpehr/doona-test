@@ -69,12 +69,16 @@ class ImageGeneratorService implements ImageServiceInterface
         $card = $this->models[$model->value];
         error_log("Runway ImageGeneratorService: Using model config: " . json_encode($card));
 
+        error_log("Runway ImageGeneratorService: Creating ImageEntity");
+        
         $entity = new ImageEntity(
             $workspace,
             $user,
             $model,
             RequestParams::fromArray($params),
         );
+        
+        error_log("Runway ImageGeneratorService: ImageEntity created successfully");
 
         $data = [
             'model' => $model->value,
@@ -161,6 +165,7 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('runway_model', $model->value);
 
             error_log("Runway ImageGeneratorService: Successfully created entity");
+            error_log("Runway ImageGeneratorService: Returning entity with ID: " . $entity->getId());
             return $entity;
             
         } catch (\Exception $e) {
