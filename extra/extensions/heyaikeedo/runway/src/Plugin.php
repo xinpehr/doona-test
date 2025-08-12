@@ -48,7 +48,12 @@ class Plugin implements PluginInterface
             ->register(VideoService::class);
 
         // Add Runway models to registry
-        $this->addRunwayModelsToRegistry();
+        try {
+            $this->addRunwayModelsToRegistry();
+        } catch (\Exception $e) {
+            // Log error in production
+            error_log("Runway Plugin: Failed to add models to registry: " . $e->getMessage());
+        }
     }
 
     /**
@@ -67,20 +72,7 @@ class Plugin implements PluginInterface
             }
         }
         
-        // If runway provider exists and has custom models, skip adding
-        if ($runwayIndex !== null) {
-            $existingModels = $directory[$runwayIndex]['models'] ?? [];
-            $hasCustomModels = false;
-            foreach ($existingModels as $model) {
-                if (isset($model['custom']) && $model['custom']) {
-                    $hasCustomModels = true;
-                    break;
-                }
-            }
-            if ($hasCustomModels) {
-                return; // Already added
-            }
-        }
+        // Always update/add models to ensure they're current
 
         // Runway provider configuration
         $runwayProvider = [
@@ -246,10 +238,32 @@ class Plugin implements PluginInterface
         ];
 
         if ($runwayIndex !== null) {
-            // Update existing provider
-            $directory[$runwayIndex] = array_merge($directory[$runwayIndex], $runwayProvider);
+            // Update existing provider - merge models carefully
+            $existingProvider = $directory[$runwayIndex];
+            $existingModels = $existingProvider['models'] ?? [];
+            $newModels = $runwayProvider['models'];
+            
+            // Merge models by key, keeping existing ones and adding new ones
+            $mergedModels = $existingModels;
+            foreach ($newModels as $newModel) {
+                $found = false;
+                foreach ($mergedModels as $i => $existingModel) {
+                    if ($existingModel['key'] === $newModel['key']) {
+                        // Update existing model
+                        $mergedModels[$i] = $newModel;
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    // Add new model
+                    $mergedModels[] = $newModel;
+                }
+            }
+            
+            $directory[$runwayIndex]['models'] = $mergedModels;
         } else {
-            // Add new provider
+            // Add new provider completely
             $directory[] = $runwayProvider;
         }
 
