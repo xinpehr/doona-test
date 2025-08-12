@@ -232,6 +232,7 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         ),
         'A' => 
         array (
+            'Aikeedo\\Runway\\' => 15,
             'Aikeedo\\Integrity\\' => 18,
             'Aikeedo\\CurrencyBeacon\\' => 23,
             'Aikeedo\\Composer\\' => 17,
@@ -782,6 +783,10 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         'Brick\\Math\\' => 
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
+        ),
+        'Aikeedo\\Runway\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/extra/extensions/heyaikeedo/runway/src',
         ),
         'Aikeedo\\Integrity\\' => 
         array (
