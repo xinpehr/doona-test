@@ -143,11 +143,13 @@ class ImageGeneratorService implements ImageServiceInterface
         try {
             error_log("Runway ImageGeneratorService: Sending API request with data: " . json_encode($data));
             
-            // Send request to Runway API
+                                // Send request to Runway API
             $resp = $this->client->sendRequest(
                 'POST',
-                '/v1/images/generations',
-                $data
+                '/v1/text_to_image',
+                $data,
+                [],
+                ['X-Runway-Version' => '2024-11-06']
             );
 
             error_log("Runway ImageGeneratorService: API response status: " . $resp->getStatusCode());

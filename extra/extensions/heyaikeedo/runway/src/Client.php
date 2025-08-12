@@ -20,7 +20,7 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 class Client
 {
-    private const BASE_URL = 'https://api.runway.ml';
+    private const BASE_URL = 'https://api.dev.runwayml.com';
 
     public function __construct(
         private ClientInterface $client,

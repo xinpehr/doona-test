@@ -80,7 +80,7 @@ class VideoService implements VideoServiceInterface
                 ]);
 
                 $url = $this->cdn->getUrl($key);
-                $data['imagePrompt'] = $url;
+                $data['promptImage'] = $url;
             }
         }
 
@@ -110,16 +110,20 @@ class VideoService implements VideoServiceInterface
         }
 
         // Determine the appropriate endpoint based on model and inputs
-        $endpoint = '/v1/videos/generations';
-        if (isset($data['imagePrompt'])) {
-            $endpoint = '/v1/videos/generations'; // Same endpoint, different parameters
+        $endpoint = '/v1/image_to_video';
+        if (isset($data['promptImage'])) {
+            $endpoint = '/v1/image_to_video'; // Image to video generation
+        } else {
+            $endpoint = '/v1/text_to_video'; // Text to video generation
         }
 
         // Send request to Runway API
         $resp = $this->client->sendRequest(
             'POST',
             $endpoint,
-            $data
+            $data,
+            [],
+            ['X-Runway-Version' => '2024-11-06']
         );
 
         $content = json_decode($resp->getBody()->getContents());
