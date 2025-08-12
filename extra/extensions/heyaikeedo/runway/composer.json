@@ -1,0 +1,43 @@
+{
+    "name": "heyaikeedo/runway",
+    "description": "Runway API integration for Aikeedo - Advanced AI video and image generation",
+    "type": "aikeedo-plugin",
+    "version": "1.0.0",
+    "homepage": "https://aikeedo.com",
+    "time": "2024-12-19",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aikeedo",
+            "email": "hey@aikeedo.com",
+            "homepage": "https://aikeedo.com",
+            "role": "Owner"
+        }
+    ],
+    "support": {
+        "chat": "https://aikeedo.com/",
+        "docs": "https://docs.aikeedo.com/",
+        "email": "support@aikeedo.com",
+        "forum": "https://aikeedo.com/",
+        "issues": "https://github.com/heyaikeedo/plugins-runway/issues",
+        "rss": "https://aikeedo.com/",
+        "source": "https://github.com/heyaikeedo/plugins-runway",
+        "wiki": "https://docs.aikeedo.com/"
+    },
+    "require": {
+        "heyaikeedo/composer": "^1.0.0"
+    },
+    "extra": {
+        "entry-class": "Aikeedo\\Runway\\Plugin",
+        "status": "inactive",
+        "title": "Runway API",
+        "description": "Advanced AI video and image generation using Runway's cutting-edge models",
+        "logo": "https://cdn.aikeedo.com/plugins/runway/logo.svg",
+        "icon": "https://cdn.aikeedo.com/plugins/runway/icon.svg"
+    },
+    "autoload": {
+        "psr-4": {
+            "Aikeedo\\Runway\\": "src/"
+        }
+    }
+}
