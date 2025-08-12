@@ -79,6 +79,7 @@ class Plugin implements PluginInterface
                     'key' => 'gen4_image',
                     'name' => 'Gen4 Image',
                     'description' => 'Advanced image generation with reference image support and style transfer capabilities',
+                    'custom' => true,
                     'provider' => [
                         'name' => 'Runway',
                         'icon' => '/assets/icons/monochrome/runway.svg'
@@ -124,6 +125,7 @@ class Plugin implements PluginInterface
                     'key' => 'gen4_turbo',
                     'name' => 'Gen4 Turbo',
                     'description' => 'Fast video generation with good quality and speed balance',
+                    'custom' => true,
                     'provider' => [
                         'name' => 'Runway',
                         'icon' => '/assets/icons/monochrome/runway.svg'
@@ -177,6 +179,7 @@ class Plugin implements PluginInterface
                     'key' => 'gen4_aleph',
                     'name' => 'Gen4 Aleph',
                     'description' => 'Highest quality video generation model with advanced features',
+                    'custom' => true,
                     'provider' => [
                         'name' => 'Runway',
                         'icon' => '/assets/icons/monochrome/runway.svg'
