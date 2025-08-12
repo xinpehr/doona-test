@@ -27,7 +27,7 @@ class Client
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
 
-        #[Inject('option.runway.api_key')]
+        #[Inject('option.runway')]
         private ?string $apiKey = null,
     ) {
     }

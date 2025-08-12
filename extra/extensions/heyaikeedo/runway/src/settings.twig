@@ -24,16 +24,16 @@
         <h2>{{ p__('heading', 'API Configuration') }}</h2>
 
         <div>
-          <label for="runway.api_key">
+          <label for="runway">
             {{ p__('label', 'API Key') }}
           </label>
 
           <div class="relative mt-2" x-data="{isVisible: false}">
-            <input class="input pr-11" id="runway.api_key"
-              name="runway[api_key]"
+            <input class="input pr-11" id="runway"
+              name="runway"
               :type="isVisible ? 'text' : 'password'" autocomplete="off"
               placeholder="{{ __('Enter your Runway API key') }}"
-              value="{{ environment == 'demo' ? 'hidden-in-demo' : option.runway.api_key ?? '' }}"
+              value="{{ environment == 'demo' ? 'hidden-in-demo' : option.runway ?? '' }}"
               required>
 
             <button type="button"

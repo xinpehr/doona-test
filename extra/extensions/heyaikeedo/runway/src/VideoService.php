@@ -32,7 +32,7 @@ class VideoService implements VideoServiceInterface
         #[Inject('option.features.video.is_enabled')]
         private bool $isToolEnabled = false,
 
-        #[Inject('option.runway.api_key')]
+        #[Inject('option.runway')]
         private ?string $apiKey = null,
     ) {
     }

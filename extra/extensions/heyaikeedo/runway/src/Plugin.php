@@ -267,7 +267,12 @@ class Plugin implements PluginInterface
             $directory[] = $runwayProvider;
         }
 
+        // Update the registry
         $this->modelRegistry['directory'] = $directory;
+        
+        // Force save using ModelRegistry's save method
         $this->modelRegistry->save();
     }
+
+
 }

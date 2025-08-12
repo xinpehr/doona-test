@@ -37,7 +37,7 @@ class ImageGeneratorService implements ImageServiceInterface
         #[Inject('option.features.imagine.is_enabled')]
         private bool $isToolEnabled = false,
 
-        #[Inject('option.runway.api_key')]
+        #[Inject('option.runway')]
         private ?string $apiKey = null,
     ) {
     }
