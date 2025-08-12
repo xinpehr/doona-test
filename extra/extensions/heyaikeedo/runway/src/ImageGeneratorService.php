@@ -80,10 +80,14 @@ class ImageGeneratorService implements ImageServiceInterface
         
         error_log("Runway ImageGeneratorService: ImageEntity created successfully");
 
+        $callbackUrl = $this->helper->getCallBackUrl($entity);
+        error_log("Runway ImageGeneratorService: Callback URL: " . $callbackUrl);
+        
         $data = [
             'model' => $model->value,
             'promptText' => $params['prompt'],
             'ratio' => $params['ratio'] ?? '1920:1080',
+            'callbackUrl' => $callbackUrl,
         ];
 
         // Handle reference images for style transfer

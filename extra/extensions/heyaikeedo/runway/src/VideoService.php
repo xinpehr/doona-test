@@ -60,6 +60,7 @@ class VideoService implements VideoServiceInterface
         $data = [
             'model' => $model->value,
             'promptText' => $params['prompt'],
+            'callbackUrl' => $this->helper->getCallBackUrl($entity),
             'ratio' => $params['ratio'] ?? '1920:1080',
             'duration' => (int)($params['duration'] ?? 5),
         ];
