@@ -42,6 +42,10 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
     #[Override]
     public function boot(Context $context): void
     {
+        // DEBUG: Plugin is booting
+        error_log("APIFrame Plugin: Boot method called");
+        error_log("APIFrame Plugin: Registry available: " . ($this->registry ? 'YES' : 'NO'));
+
         // Add template path to the TWIG loader to scan for view templates 
         // in current directory. The first argument is the path to the directory,
         // the second argument is the namespace to use in the template.
@@ -55,7 +59,14 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         $this->factory->register(ImageGeneratorService::class);
 
         // Register APIFrame models in the registry immediately when plugin boots
-        $this->registerModels();
+        try {
+            error_log("APIFrame Plugin: Attempting to register models");
+            $this->registerModels();
+            error_log("APIFrame Plugin: Models registered successfully");
+        } catch (\Exception $e) {
+            error_log("APIFrame Plugin Error: " . $e->getMessage());
+            error_log("APIFrame Plugin Stack Trace: " . $e->getTraceAsString());
+        }
     }
 
     #[Override]
