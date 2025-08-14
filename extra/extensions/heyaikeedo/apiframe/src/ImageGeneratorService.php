@@ -133,12 +133,10 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_mode', $mode);
             $entity->addMeta('apiframe_status', 'pending');
 
-            error_log("APIFrame: Task submitted successfully. Entity returned immediately.");
+            error_log("APIFrame: Task submitted successfully. Starting simple polling...");
             
-            // Start polling in background using PHP's shutdown function
-            register_shutdown_function(function() use ($entity, $response) {
-                $this->pollTaskInBackground($entity, $response['task_id']);
-            });
+            // Start simple polling loop (blocking but with timeout)
+            $this->pollTask($entity, $response['task_id']);
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
@@ -236,18 +234,6 @@ class ImageGeneratorService implements ImageServiceInterface
     }
 
     /**
-     * Background polling for completed tasks
-     */
-    private function pollTaskInBackground(ImageEntity $entity, string $taskId): void
-    {
-        // This runs after response is sent to user
-        error_log("APIFrame: Starting background polling for task: " . $taskId);
-        
-        // Call the main polling method but don't block the response
-        $this->pollTask($entity, $taskId);
-    }
-
-    /**
      * Simple polling method - exactly as per APIFrame docs
      */
     private function pollTask(ImageEntity $entity, string $taskId): void
@@ -298,14 +284,13 @@ class ImageGeneratorService implements ImageServiceInterface
                     case 'processing':
                     case 'pending':
                     case 'queued':
-                    case 'staged':
                         $progress = $result['percentage'] ?? 'unknown';
                         error_log("APIFrame: Task still processing... Progress: " . $progress);
-                        continue 2; // Continue outer while loop
+                        continue; // Continue polling
                         
                     default:
                         error_log("APIFrame: Unknown status: " . $status . ", continuing...");
-                        continue 2; // Continue outer while loop
+                        continue;
                 }
                 
             } catch (\Exception $e) {
