@@ -281,22 +281,36 @@ class ImageGeneratorService implements ImageServiceInterface
         // "image_urls": ["url1", "url2", "url3", "url4"]
         // or "original_image_url": "grid_url"
         
-        $imageUrl = null;
+        $imageUrls = [];
+        $mainImageUrl = null;
         
         // Try image_urls array first (most common)
         if (isset($result['image_urls']) && is_array($result['image_urls']) && !empty($result['image_urls'])) {
-            $imageUrl = $result['image_urls'][0]; // Use first image
-            error_log("APIFrame: Found image_urls, using first: " . $imageUrl);
+            $imageUrls = $result['image_urls'];
+            $mainImageUrl = $result['image_urls'][0]; // Use first image as main
+            error_log("APIFrame: Found " . count($imageUrls) . " image URLs, using first as main: " . $mainImageUrl);
+            
+            // Store all image URLs in metadata for frontend access
+            $entity->addMeta('apiframe_all_images', json_encode($imageUrls));
+            $entity->addMeta('apiframe_image_count', count($imageUrls));
         }
         // Try single image_url
         elseif (isset($result['image_url'])) {
-            $imageUrl = $result['image_url'];
-            error_log("APIFrame: Found single image_url: " . $imageUrl);
+            $mainImageUrl = $result['image_url'];
+            $imageUrls = [$mainImageUrl];
+            error_log("APIFrame: Found single image_url: " . $mainImageUrl);
+            
+            $entity->addMeta('apiframe_all_images', json_encode($imageUrls));
+            $entity->addMeta('apiframe_image_count', 1);
         }
         // Try original_image_url (grid)
         elseif (isset($result['original_image_url'])) {
-            $imageUrl = $result['original_image_url'];
-            error_log("APIFrame: Found original_image_url: " . $imageUrl);
+            $mainImageUrl = $result['original_image_url'];
+            $imageUrls = [$mainImageUrl];
+            error_log("APIFrame: Found original_image_url: " . $mainImageUrl);
+            
+            $entity->addMeta('apiframe_all_images', json_encode($imageUrls));
+            $entity->addMeta('apiframe_image_count', 1);
         }
         else {
             error_log("APIFrame: No image URLs found in completed response: " . json_encode($result));
@@ -305,8 +319,13 @@ class ImageGeneratorService implements ImageServiceInterface
             return;
         }
         
-        // Process the image
-        $this->processImageFromUrl($entity, $imageUrl);
+        // Process the main image (first one)
+        $this->processImageFromUrl($entity, $mainImageUrl);
+        
+        // If we have multiple images, download and store all URLs for frontend access
+        if (count($imageUrls) > 1) {
+            $this->processAllImages($entity, $imageUrls);
+        }
     }
     
     /**
@@ -403,8 +422,56 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->setState(State::FAILED);
         }
     }
-
-
+    
+    /**
+     * Process all images and store their URLs in metadata
+     */
+    private function processAllImages(ImageEntity $entity, array $imageUrls): void
+    {
+        error_log("APIFrame: Processing all " . count($imageUrls) . " images for metadata storage");
+        
+        $processedUrls = [];
+        
+        foreach ($imageUrls as $index => $imageUrl) {
+            try {
+                error_log("APIFrame: Processing image " . ($index + 1) . "/" . count($imageUrls) . ": " . $imageUrl);
+                
+                // Download image
+                $imageData = file_get_contents($imageUrl);
+                if ($imageData === false) {
+                    error_log("APIFrame: Failed to download image " . ($index + 1) . ": " . $imageUrl);
+                    continue;
+                }
+                
+                // Generate CDN path for this image
+                $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
+                $name = $this->cdn->generatePath($extension, $entity->getWorkspace(), $entity->getUser());
+                
+                // Upload to CDN
+                $this->cdn->write($name, $imageData);
+                $cdnUrl = $this->cdn->getUrl($name);
+                
+                $processedUrls[] = [
+                    'index' => $index + 1,
+                    'original_url' => $imageUrl,
+                    'cdn_url' => $cdnUrl,
+                    'size' => strlen($imageData)
+                ];
+                
+                error_log("APIFrame: Image " . ($index + 1) . " uploaded to CDN: " . $cdnUrl);
+                
+            } catch (\Exception $e) {
+                error_log("APIFrame: Error processing image " . ($index + 1) . ": " . $e->getMessage());
+                continue;
+            }
+        }
+        
+        // Store processed URLs in metadata
+        if (!empty($processedUrls)) {
+            $entity->addMeta('apiframe_processed_images', json_encode($processedUrls));
+            error_log("APIFrame: Stored " . count($processedUrls) . " processed images in metadata");
+        }
+    }
 
 
 }
