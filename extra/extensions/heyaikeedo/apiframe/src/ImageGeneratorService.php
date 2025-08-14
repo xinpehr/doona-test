@@ -51,11 +51,16 @@ class ImageGeneratorService implements ImageServiceInterface
         Model $model,
         ?array $params = null
     ): ImageEntity {
+        error_log("APIFrame: generateImage called with model: " . $model->value);
+        error_log("APIFrame: Available models: " . json_encode(array_keys($this->models ?? [])));
+        
         if (!$params || !array_key_exists('prompt', $params)) {
+            error_log("APIFrame Error: Missing prompt parameter");
             throw new DomainException('Missing parameter: prompt');
         }
 
         if (!$this->supportsModel($model)) {
+            error_log("APIFrame Error: Model not supported: " . $model->value);
             throw new DomainException('Model not supported: ' . $model->value);
         }
 
@@ -84,6 +89,12 @@ class ImageGeneratorService implements ImageServiceInterface
         $webhookSecret = $this->helper->generateWebhookSecret($entity);
 
         try {
+            error_log("APIFrame: API Key available: " . ($this->apiKey ? 'YES' : 'NO'));
+            error_log("APIFrame: Tool enabled: " . ($this->isToolEnabled ? 'YES' : 'NO'));
+            error_log("APIFrame: Prompt: " . $params['prompt']);
+            error_log("APIFrame: Mode: " . $mode);
+            error_log("APIFrame: Webhook URL: " . $webhookUrl);
+            
             // Send imagine request to APIFrame
             $response = $this->client->imagine(
                 $params['prompt'],
@@ -91,6 +102,8 @@ class ImageGeneratorService implements ImageServiceInterface
                 $webhookUrl,
                 $webhookSecret
             );
+            
+            error_log("APIFrame: Response received: " . json_encode($response));
 
             if (!isset($response['task_id'])) {
                 throw new DomainException('Invalid response from APIFrame API');
