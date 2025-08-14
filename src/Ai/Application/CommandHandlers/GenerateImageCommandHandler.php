@@ -73,46 +73,30 @@ class GenerateImageCommandHandler
             is_null($entity->getTitle()->value)
             && isset($cmd->params['prompt'])
         ) {
-            error_log("GenerateImageCommandHandler: Generating title for entity");
-            try {
-                $service = $this->factory->create(
-                    TitleServiceInterface::class,
-                    $ws->getSubscription()
-                        ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
-                        : new Model('gpt-3.5-turbo')
-                );
+            $service = $this->factory->create(
+                TitleServiceInterface::class,
+                $ws->getSubscription()
+                    ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
+                    : new Model('gpt-3.5-turbo')
+            );
 
-                $content = new Content($cmd->params['prompt']);
-                $titleResp = $service->generateTitle(
-                    $content,
-                    $ws->getSubscription()
-                        ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
-                        : new Model('gpt-3.5-turbo')
-                );
+            $content = new Content($cmd->params['prompt']);
+            $titleResp = $service->generateTitle(
+                $content,
+                $ws->getSubscription()
+                    ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
+                    : new Model('gpt-3.5-turbo')
+            );
 
-                $entity->setTitle($titleResp->title);
-                $entity->addCost($titleResp->cost);
-                error_log("GenerateImageCommandHandler: Title generated successfully");
-            } catch (\Exception $e) {
-                error_log("GenerateImageCommandHandler: Exception during title generation: " . $e->getMessage());
-                error_log("GenerateImageCommandHandler: Skipping title generation and continuing");
-                // Don't throw, just skip title generation
-            }
+            $entity->setTitle($titleResp->title);
+            $entity->addCost($titleResp->cost);
         }
 
-        error_log("GenerateImageCommandHandler: Adding entity to repository");
         $this->repo->add($entity);
         
-        error_log("GenerateImageCommandHandler: Flushing repository to persist entity");
         // Flush immediately to persist entity to database
         // This ensures the entity appears in library even during async processing
-        try {
-            $this->repo->flush();
-            error_log("GenerateImageCommandHandler: Repository flushed successfully");
-        } catch (\Exception $e) {
-            error_log("GenerateImageCommandHandler: Exception during flush: " . $e->getMessage());
-            throw $e;
-        }
+        $this->repo->flush();
 
         if ($entity->getCost()->value > 0) {
             // Deduct credit from workspace
@@ -123,7 +107,6 @@ class GenerateImageCommandHandler
             $this->dispatcher->dispatch($event);
         }
 
-        error_log("GenerateImageCommandHandler: Returning entity with ID: " . $entity->getId()->getValue());
         return $entity;
     }
 }

@@ -10,7 +10,6 @@ use Ai\Domain\Image\ImageServiceInterface;
 use Ai\Domain\ValueObjects\Model;
 use Ai\Domain\ValueObjects\RequestParams;
 use Ai\Domain\ValueObjects\State;
-use Ai\Domain\ValueObjects\Title;
 use Ai\Infrastructure\Services\CostCalculator;
 use Easy\Container\Attributes\Inject;
 use File\Domain\Entities\ImageFileEntity;
@@ -62,9 +61,7 @@ class ImageGeneratorService implements ImageServiceInterface
         Model $model,
         ?array $params = null
     ): ImageEntity {
-        error_log("APIFrame: generateImage called - Start");
-        error_log("APIFrame: Model: " . $model->value);
-        error_log("APIFrame: Params: " . json_encode($params));
+        error_log("APIFrame: Generating image with model: " . $model->value);
         
         if (!$params || !array_key_exists('prompt', $params)) {
             error_log("APIFrame: Missing prompt parameter");
@@ -85,17 +82,8 @@ class ImageGeneratorService implements ImageServiceInterface
             RequestParams::fromArray($params)
         );
         
-        // Set a basic title from prompt to avoid title generation issues
-        if (isset($params['prompt'])) {
-            $title = mb_substr($params['prompt'], 0, 100); // Limit to 100 characters
-            $entity->setTitle(new Title($title));
-            error_log("APIFrame: Set title: " . $title);
-        }
-        
-        // Note: Don't set output file yet - will be set when image is ready (like FalAI)
         // Set initial state as PROCESSING so it appears in archive
         $entity->setState(State::PROCESSING);
-        error_log("APIFrame: Entity created without output file (will be set asynchronously)");
 
         // Determine mode from model configuration
         $mode = 'fast'; // default
@@ -109,24 +97,15 @@ class ImageGeneratorService implements ImageServiceInterface
         }
 
         try {
-            error_log("APIFrame: About to call imagine API");
-            error_log("APIFrame: Prompt: " . $params['prompt']);
-            error_log("APIFrame: Mode: " . $mode);
-            
             // Send imagine request to APIFrame
             $response = $this->client->imagine(
                 $params['prompt'],
                 $mode
             );
 
-            error_log("APIFrame: API Response: " . json_encode($response));
-
             if (!isset($response['task_id'])) {
-                error_log("APIFrame: Invalid response - no task_id");
                 throw new DomainException('Invalid response from APIFrame API');
             }
-
-            error_log("APIFrame: Task ID received: " . $response['task_id']);
 
             // Store task information in entity metadata
             $entity->addMeta('apiframe_task_id', $response['task_id']);
@@ -169,39 +148,7 @@ class ImageGeneratorService implements ImageServiceInterface
             yield new Model($key);
         }
     }
-    
-    /**
-     * Public method to check and update APIFrame tasks
-     * Can be called by cron jobs or API endpoints
-     */
-    public function checkPendingTasks(): void
-    {
-        error_log("APIFrame: Checking all pending tasks...");
-        
-        // This method can be called by:
-        // 1. Cron job every few minutes
-        // 2. API endpoint for manual refresh
-        // 3. Background worker process
-        
-        // For now, just log that it's available
-        // Implementation would query database for pending APIFrame tasks
-        // and check their status using the fetch API
-    }
-    
-    /**
-     * Public method to check a specific task by entity ID
-     */
-    public function checkTaskById(string $entityId): bool
-    {
-        error_log("APIFrame: Checking task for entity: " . $entityId);
-        
-        // Load entity from database
-        // Get task_id from metadata
-        // Call fetch API
-        // Update entity if completed
-        
-        return false; // Return true if updated
-    }
+
 
     /**
      * Parse models from registry directory
@@ -403,15 +350,13 @@ class ImageGeneratorService implements ImageServiceInterface
                 BlurHashGenerator::generateBlurHash($img, $width, $height)
             );
             
-            // Calculate cost
-            $cost = $this->calc->calculate(1, $entity->getModel());
-            $entity->addCost($cost);
+            // Cost will be calculated by the main system
             
             // Complete the entity
             $entity->setOutputFile($file);
             $entity->setState(State::COMPLETED);
             
-            error_log("APIFrame: Task completed successfully! Cost: " . $cost->value);
+            error_log("APIFrame: Task completed successfully!");
             
             imagedestroy($img);
             
