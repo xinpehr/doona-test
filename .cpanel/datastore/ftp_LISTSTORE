@@ -1,0 +1,1 @@
+{"version":"2.4","status":1,"mode":"simple","statusmsg":"Ran adminbin Cpanel/ftp/LISTSTORE","action":"fetch","timeout":0,"data":[{"homedir":"/home/appcloud","type":"main","user":"appcloud"},{"type":"logaccess","homedir":"/etc/apache2/logs/domlogs/appcloud","user":"appcloud_logs"}],"exit_code":0,"error":0}

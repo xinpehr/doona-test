@@ -1,0 +1,562 @@
+AWSTATS DATA FILE 7.9 (build 20230108)
+# If you remove this file, all statistics for date 202508 will be lost/reset.
+# Last config file used to build this data file was /home/appcloud/tmp/awstats/ssl/awstats.app.doona.cloud.conf.
+
+# Position (offset in bytes) in this file for beginning of each section for
+# direct I/O access. If you made changes somewhere in this file, you should
+# also remove completely the MAP section (AWStats will rewrite it at next
+# update).
+BEGIN_MAP 28
+POS_GENERAL 2050                
+POS_TIME 2720                
+POS_VISITOR 10195               
+POS_DAY 13306               
+POS_DOMAIN 3365                
+POS_LOGIN 3827                
+POS_ROBOT 3982                
+POS_WORMS 4355                
+POS_EMAILSENDER 4486                
+POS_EMAILRECEIVER 4629                
+POS_SESSION 13444               
+POS_FILESIZE 16723               
+POS_SIDER 13650               
+POS_FILETYPES 4764                
+POS_DOWNLOADS 4990                
+POS_OS 5038                
+POS_BROWSER 5292                
+POS_SCREENSIZE 5907                
+POS_UNKNOWNREFERER 5981                
+POS_UNKNOWNREFERERBROWSER 6431                
+POS_ORIGIN 6651                
+POS_SEREFERRALS 6790                
+POS_PAGEREFS 6934                
+POS_SEARCHWORDS 7082                
+POS_KEYWORDS 7234                
+POS_MISC 2383                
+POS_ERRORS 7293                
+POS_CLUSTER 3683                
+POS_SIDER_404 7444                
+END_MAP
+
+# LastLine    = Date of last record processed - Last record line number in last log - Last record offset in last log - Last record signature value
+# FirstTime   = Date of first visit for history file
+# LastTime    = Date of last visit for history file
+# LastUpdate  = Date of last update - Nb of parsed records - Nb of parsed old records - Nb of parsed new records - Nb of parsed corrupted - Nb of parsed dropped
+# TotalVisits = Number of visits
+# TotalUnique = Number of unique visitors
+# MonthHostsKnown   = Number of hosts known
+# MonthHostsUnKnown = Number of hosts unknown
+BEGIN_GENERAL 8
+LastLine 20250814062600 131 32948 15743231955413
+FirstTime 0
+LastTime 20250814062555
+LastUpdate 20250814094701 131 0 131 0 0
+TotalVisits 82                  
+TotalUnique 77                  
+MonthHostsKnown 0                   
+MonthHostsUnknown 78                  
+END_GENERAL
+
+# Misc ID - Pages - Hits - Bandwidth
+BEGIN_MISC 10
+WindowsMediaPlayerSupport 0 0 0
+RealPlayerSupport 0 0 0
+DirectorSupport 0 0 0
+JavaEnabled 0 0 0
+TotalMisc 0 0 0
+PDFSupport 0 0 0
+FlashSupport 0 0 0
+AddToFavourites 0 23 0
+QuickTimeSupport 0 0 0
+JavascriptDisabled 0 0 0
+END_MISC
+
+# Hour - Pages - Hits - Bandwidth - Not viewed Pages - Not viewed Hits - Not viewed Bandwidth
+BEGIN_TIME 24
+0 12 158 8113950 2 15 62143
+1 1 24 1341002 0 1 4820
+2 0 0 0 0 0 0
+3 0 0 0 1 1 26014
+4 0 0 0 0 0 0
+5 1 2 23433 1 1 3585
+6 1 24 1341002 36 40 142937
+7 2 5 63905 0 3 10773
+8 0 0 0 0 0 0
+9 55 167 7310941 56 66 110497
+10 130 194 4285126 20 55 4965988
+11 302 456 17828893 51 58 116660
+12 473 737 35180528 13 42 136778
+13 3 3 17736 0 0 0
+14 4 20 1148395 0 3 13257
+15 0 0 0 0 0 0
+16 0 0 0 0 0 0
+17 1 1 6394 0 1 3591
+18 1 1 6394 0 1 6075
+19 1 24 1341002 0 0 0
+20 2 25 1347396 0 0 0
+21 0 0 0 0 0 0
+22 0 0 0 0 0 0
+23 0 0 0 0 0 0
+END_TIME
+
+# Domain - Pages - Hits - Bandwidth
+# The 25 first Pages must be first (order not required for others)
+BEGIN_DOMAIN 17
+fi 880 1274 52485038
+us 75 308 14231699
+in 14 64 2966445
+nl 5 79 4148082
+de 2 5 37341
+ru 2 2 12788
+cl 1 1 6394
+ca 1 1 23708
+nz 1 1 5912
+gb 1 1 6394
+jp 1 1 6394
+fr 1 24 1341002
+ao 1 24 1341002
+ro 1 26 1348516
+es 1 3 13908
+am 1 24 1341002
+za 1 3 40472
+END_DOMAIN
+
+# Cluster ID - Pages - Hits - Bandwidth
+BEGIN_CLUSTER 0
+END_CLUSTER
+
+# Login - Pages - Hits - Bandwidth - Last visit
+# The 10 first Pages must be first (order not required for others)
+BEGIN_LOGIN 0
+END_LOGIN
+
+# Robot ID - Hits - Bandwidth - Last visit - Hits on robots.txt
+# The 25 first Hits must be first (order not required for others)
+BEGIN_ROBOT 6
+bot[\s_+:,\.\;\/\\-] 37 4931709 20250812105151 0
+no_user_agent 4 36916 20250813034137 0
+[\s_+:,\.\;\/\\-]bot 1 3986 20250812120124 0
+Go\-http\-client/ 1 6384 20250813062605 0
+Googlebot/ 1 5921 20250812093353 0
+scrapy 1 5915 20250812093916 0
+END_ROBOT
+
+# Worm ID - Hits - Bandwidth - Last visit
+# The 5 first Hits must be first (order not required for others)
+BEGIN_WORMS 0
+END_WORMS
+
+# EMail - Hits - Bandwidth - Last visit
+# The 20 first Hits must be first (order not required for others)
+BEGIN_EMAILSENDER 0
+END_EMAILSENDER
+
+# EMail - Hits - Bandwidth - Last visit
+# The 20 first hits must be first (order not required for others)
+BEGIN_EMAILRECEIVER 0
+END_EMAILRECEIVER
+
+# Files type - Hits - Bandwidth - Bandwidth without compression - Bandwidth after compression
+BEGIN_FILETYPES 8
+woff2 32 28233216 0 0
+svg 111 376209 0 0
+css 84 1704934 0 0
+html 65 478969 0 0
+js 294 20263187 0 0
+Unknown 853 2716650 0 0
+webp 363 25566716 0 0
+php 39 16216 0 0
+END_FILETYPES
+
+# Downloads - Hits - Bandwidth
+BEGIN_DOWNLOADS 0
+END_DOWNLOADS
+
+# OS ID - Hits
+BEGIN_OS ID - Hits - Pages 13
+ios_ipad 1 0
+win7 75 6
+linux 108 16
+win10 178 13
+macosx9 1 1
+Unknown 51 50
+macosx13 1 0
+winphone 1 0
+androidmarshmallow 54 3
+androidpie 1 1
+ios_iphone 72 3
+macosx15 1291 893
+android10 7 3
+END_OS
+
+# Browser ID - Hits - Pages
+BEGIN_BROWSER 30
+chrome98.0.4758.102 24 1
+chrome132.0.0.0 51 3
+firefox83.0 1 1
+msie10.0 1 0
+chrome45.0.2454.85 75 6
+chrome138.0.7204.96 24 1
+chrome33.0.1750.152 1 1
+safari12.0.3 1 0
+firefox120.0 5 5
+chrome84.0.4147.89 1 1
+chrome67.0.3396.87 1 1
+safari14.0.3 24 1
+chrome137.0.0.0 26 3
+firefox139.0 1 1
+edge18 24 1
+chrome130.0.0.0 107 6
+firefox124.0 1 1
+netscape5.0 1 0
+Unknown 48 48
+chrome138.0.0.0 25 2
+chrome116.0.0.0 40 13
+edge12 1 1
+safari11.0 1 0
+safari 48 2
+chrome128.0.0.0 1 1
+chrome117.0.0.0 5 5
+chrome131.0.0.0 3 1
+chrome139.0.0.0 1274 880
+chrome104.0.0.0 24 1
+mozilla 2 2
+END_BROWSER
+
+# Screen size - Hits
+BEGIN_SCREENSIZE 0
+END_SCREENSIZE
+
+# Unknown referer OS - Last visit date
+BEGIN_UNKNOWNREFERER 6
+Mozilla/5.0_(compatible;_UGAResearchAgent/1.0;_Please_visit:_NISLabUGA.github.io) 20250812101547
+Mozilla/5.0 20250813054227
+GitHub-Hookshot/a214eb0 20250812122818
+GitHub-Hookshot/V2-17faf18 20250812093400
+Mozilla/5.0_(compatible;_InternetMeasurement/1.0;__https://internet-measurement.com/) 20250813185145
+got_(https://github.com/sindresorhus/got) 20250812114906
+END_UNKNOWNREFERER
+
+# Unknown referer Browser - Last visit date
+BEGIN_UNKNOWNREFERERBROWSER 3
+got_(https://github.com/sindresorhus/got) 20250812114906
+GitHub-Hookshot/V2-17faf18 20250812093400
+GitHub-Hookshot/a214eb0 20250812122818
+END_UNKNOWNREFERERBROWSER
+
+# Origin - Pages - Hits 
+BEGIN_ORIGIN 6
+From0 153 220
+From1 0 0
+From2 0 0
+From3 0 0
+From4 836 1621
+From5 0 0
+END_ORIGIN
+
+# Search engine referers ID - Pages - Hits
+BEGIN_SEREFERRALS 0
+END_SEREFERRALS
+
+# External page referers - Pages - Hits
+# The 25 first Pages must be first (order not required for others)
+BEGIN_PAGEREFS 0
+END_PAGEREFS
+
+# Search keyphrases - Number of search
+# The 10 first number of search must be first (order not required for others)
+BEGIN_SEARCHWORDS 0
+END_SEARCHWORDS
+
+# Search keywords - Number of search
+# The 25 first number of search must be first (order not required for others)
+BEGIN_KEYWORDS 0
+END_KEYWORDS
+
+# Errors - Hits - Bandwidth
+BEGIN_ERRORS 7
+422 2 90
+500 15 384
+204 21 0
+302 21 0
+201 2 1040
+404 146 482623
+403 7 4740
+END_ERRORS
+
+# URL with 404 errors - Hits - Last URL referrer
+BEGIN_SIDER_404 76
+/webhooks/runway/01989d74-ea37-7361-966f-ce8f51848948 2 -
+/v2/_catalog 1 -
+/e/heyaikeedo/default/assets/favicon.ico%3Fv%3D3.2.4 2 -
+/config/production.json 1 -
+/.env 3 -
+/actuator/env 1 -
+/js/lkk_ch.js 3 -
+/assets/icons/monochrome/runway.svg 30 https://app.doona.cloud/app/imagine
+/https%3A/fonts.googleapis.com/assets/base-C3KDQ-kn.js 1 -
+/web.config 1 -
+/config.yaml 1 -
+/e/heyaikeedo/default/assets/app 1 -
+/ads.txt 1 -
+/https%3A/fonts.googleapis.com/app 1 -
+/@vite/env 1 -
+/config.php 1 -
+/js/twint_ch.js 3 -
+/config.json 2 -
+/%23features 1 -
+/app-ads.txt 1 -
+/https%3A/fonts.googleapis.com/assets/app-BDQYcOYR.js 1 -
+/e/heyaikeedo/default/assets/assets/app-BDQYcOYR.js 1 -
+/backup.zip 1 -
+/user_secrets.yml 1 -
+/server-status 2 -
+/https%3A/fonts.googleapis.com/css2%3Ffamily%3DInter%3Awght%40300%3B400%3B500%3B600%3B700%26family%3DNoto%2BSerif%3Awght%40100%3B300%3B400%3B500%3B600%3B700%26display%3Dswap 1 -
+/.ssh/id_ecdsa 1 -
+/config.xml 1 -
+/.vscode/sftp.json 2 -
+/admin/runway/settings 5 -
+/docker-compose.yml 1 -
+/db/schema.rb 1 -
+/debug/default/view 1 -
+/server 1 -
+/backup.sql 1 -
+/e/heyaikeedo/default/assets/https%3A/fonts.googleapis.com/css2%3Ffamily%3DInter%3Awght%40300%3B400%3B500%3B600%3B700%26family%3DNoto%2BSerif%3Awght%40100%3B300%3B400%3B500%3B600%3B700%26display%3Dswap 1 -
+/https%3A/fonts.googleapis.com/css2%3Ffamily%3DInter%3Awght%40300%3B400%3B500%3B600%3B700%26display%3Dswap 1 -
+/.ssh/id_ed25519 1 -
+/_all_dbs 1 -
+/etc/ssl/private/server.key 1 -
+/.ssh/id_rsa 1 -
+/admin/settings/runway 15 -
+/%23pricing 1 -
+/.DS_Store 1 -
+/%23faq 1 -
+/install 6 -
+/_vti_pvt/service.pwd 1 -
+/https%3A/fonts.googleapis.com/https%3A/fonts.googleapis.com/css2%3Ffamily%3DInter%3Awght%40300%3B400%3B500%3B600%3B700%26family%3DNoto%2BSerif%3Awght%40100%3B300%3B400%3B500%3B600%3B700%26display%3Dswap 1 -
+/wp-config.php 1 -
+/info.php 1 -
+/cloud-config.yml 1 -
+/login.action 1 -
+/.env.production 1 -
+/api/.env 1 -
+/dump.sql 1 -
+/backup.tar.gz 1 -
+/settings.py 1 -
+/.aws/credentials 1 -
+/%23product 1 -
+/telescope/requests 1 -
+/server.key 1 -
+/e/heyaikeedo/default/assets/assets/base-C3KDQ-kn.js 1 -
+/secrets.json 1 -
+/phpinfo.php 1 -
+//admin/settings/runway 2 -
+/sellers.json 1 -
+/wp-admin/setup-config.php 1 -
+/ecp/Current/exporttool/microsoft.exchange.ediscovery.exporttool.application 1 -
+/s/2353e24363e2033313e24393/_/ 1 -
+//cdn.js 3 -
+/about 1 -
+/database.sql 1 -
+/robots.txt 5 -
+/config.yml 1 -
+/database_backup.sql 1 -
+/feed 1 -
+END_SIDER_404
+
+# Host - Pages - Hits - Bandwidth - Last visit date - [Start date of last visit] - [Last page of last visit]
+# [Start date of last visit] and [Last page of last visit] are saved only if session is not finished
+# The 25 first Hits must be first (order not required for others)
+BEGIN_VISITOR 78
+94.237.50.171 880 1274 52485038 20250812123700
+103.196.9.176 9 13 268088 20250812094206
+98.82.130.157 4 4 15944 20250812113240
+140.82.115.76 4 4 1062 20250812120809
+140.82.115.9 4 4 1788 20250812121233
+157.143.53.238 3 54 3447450 20250813100010
+3.87.78.146 3 3 11958 20250812114906
+104.252.191.60 3 3 14888 20250812101632
+54.247.57.72 3 26 1351441 20250812093610
+44.249.247.95 2 48 2681080 20250812103247
+104.252.191.154 2 2 11824 20250812134414
+140.82.115.8 2 2 737 20250812120345
+140.82.115.251 2 2 617 20250812115900
+140.82.115.10 2 2 427 20250812113538
+98.81.215.227 2 2 7972 20250812112028
+140.82.115.60 2 2 619 20250812111732
+140.82.115.29 2 2 890 20250812122225
+140.82.115.66 1 1 304 20250812115632
+140.82.115.155 1 1 999 20250812110420
+176.32.195.85 1 24 1341002 20250813111755
+140.82.115.45 1 1 120 20250812112717
+140.82.115.93 1 1 120 20250812115602
+140.82.115.34 1 1 316 20250812123014
+64.15.129.124 1 1 23708 20250812100505
+54.159.35.74 1 24 1341002 20250813010632
+91.195.98.88 1 26 1348516 20250813002301
+98.159.226.70 1 19 1228714 20250813001742
+140.82.115.73 1 1 120 20250812110855
+196.251.88.64 1 3 40472 20250813071843
+140.82.115.112 1 1 120 20250812104434
+156.59.50.202 1 1 5912 20250812124338
+23.27.145.125 1 1 6394 20250813145525
+140.82.115.79 1 1 120 20250812095525
+45.148.124.30 1 24 1341002 20250813194235
+140.82.115.51 1 1 2612 20250812123235
+140.82.115.43 1 1 317 20250812113330
+62.210.90.209 1 24 1341002 20250813003623
+140.82.115.246 1 1 313 20250812121847
+23.27.145.211 1 1 6394 20250812141655
+82.223.49.57 1 3 13908 20250813002100
+103.4.250.181 1 1 5451 20250812101554
+133.242.174.119 1 1 6394 20250812173916
+103.4.250.165 1 1 5451 20250812094136
+185.247.137.243 1 1 6394 20250813185145
+104.253.252.246 1 24 1340541 20250812094413
+140.82.115.94 1 1 388 20250812122818
+140.82.115.243 1 1 292 20250812113204
+154.210.103.57 1 24 1341002 20250813001828
+5.101.64.6 1 1 6394 20250813111751
+104.232.194.108 1 1 5912 20250813001815
+93.174.93.114 1 1 6394 20250813001755
+103.4.250.218 1 1 5912 20250812134405
+23.27.145.173 1 1 6394 20250813121141
+140.82.115.5 1 1 534 20250812114544
+140.82.115.104 1 1 252 20250812095612
+40.80.158.10 1 24 1341002 20250813091356
+128.192.12.109 1 1 5915 20250812101547
+149.88.102.117 1 24 1341002 20250813001621
+181.214.164.43 1 1 6394 20250813001833
+140.82.115.67 1 1 280 20250812121505
+65.130.229.81 1 3 13908 20250813002059
+89.248.172.33 1 24 1341002 20250814062555 20250814062555 /
+94.102.63.27 1 1 6394 20250813201812
+213.209.143.116 1 2 23433 20250813054226
+54.188.31.149 1 2 23433 20250813070948
+140.82.115.17 1 1 611 20250812114133
+140.82.115.26 1 1 297 20250812113350
+103.4.250.198 1 24 1340541 20250812094412
+80.82.70.198 1 4 30276 20250813201820
+94.102.49.123 1 44 2651728 20250813001757
+140.82.115.12 1 1 295 20250812120556
+23.27.145.38 1 1 5921 20250812113718
+140.82.115.78 1 1 667 20250812111354
+91.52.97.253 1 3 13908 20250813002058
+85.203.23.25 0 5 112288 
+128.199.0.16 1 1 6394 20250813124717
+23.27.145.228 1 1 6394 20250813142537
+140.82.115.175 1 1 999 20250812110750
+END_VISITOR
+
+# Date - Pages - Hits - Bandwidth - Visits
+BEGIN_DAY 3
+20250812 960 1506 61832112 53
+20250813 28 311 16182983 28
+20250814 1 24 1341002 1
+END_DAY
+
+# Session range - Number of visits
+BEGIN_SESSION 7
+2mn-5mn 2
+30mn-1h 4
+5mn-15mn 1
+0s-30s 69
+15mn-30mn 2
+1h+ 1
+30s-2mn 2
+END_SESSION
+
+# URL - Pages - Bandwidth - Entry - Exit
+# The 25 first Pages must be first (order not required for others)
+BEGIN_SIDER 79
+/api/library/images/01989d6e-3867-714c-9253-0e4d22b0262b 108 120516 0 0
+/api/library/images/01989d7b-79bb-7398-9c7a-bedc2ac13f7e 57 64191 0 0
+/admin/api/plans 54 3175 0 0
+/ 54 339763 47 44
+/api/library/images 40 41464 0 0
+/deploy.php 39 16216 30 30
+/admin/settings 36 668271 0 0
+/api/library/images/01989d78-0c2b-71e2-88da-5723034e2d4c 36 40670 0 0
+/api/library/images/01989d74-ea37-7361-966f-ce8f51848948 34 38046 0 0
+/assets/tabler-icons-BM2YwPh7.woff2 32 28233216 0 0
+/admin/api/users 31 15069 0 0
+/admin/api/plugins 29 10785 0 0
+/admin/api/users/count 28 420 0 0
+/admin/api/plugins/count 27 405 0 1
+/api/library/images/01989d72-4d51-7009-b1eb-916124e85e7e 24 26844 0 0
+/admin/plugins 23 210960 0 0
+/admin/settings/models 19 236784 0 0
+/api/library/images/01989d80-ac79-71cb-a1ac-1a28bed28c72 19 21218 0 0
+/admin/api/plugins/heyaikeedo/runway 18 6102 0 0
+/admin/api/orders 17 496 0 1
+/admin/api/reports/dataset/usage 15 84 0 0
+/admin 14 129604 1 0
+/app/imagine 14 225444 0 0
+/admin/api/reports/stats 14 1976 0 0
+/admin/api/subscriptions 14 2995 0 0
+/admin/api/orders/count 4 60 0 0
+/admin/api/plugins/heyaikeedo/currency-beacon/initialize 1 325 0 0
+/api/library/images/01989d82-666e-7043-8364-e354c32d16ae 6 6705 0 0
+/admin/plans/ 1 9336 0 0
+/recovery 1 3856 0 1
+/admin/plugins/new 2 12741 0 0
+/app/library 5 39673 0 0
+/app/imagine/01989d78-0c2b-71e2-88da-5723034e2d4c 1 17011 0 0
+/signup 1 3915 0 0
+/api/auth/basic 1 218 0 0
+/admin/settings/features/video 1 6584 0 0
+/install/api/users 1 544 0 0
+/admin/themes 1 9138 0 0
+/app/library/conversations 1 0 0 0
+/admin/plugins/ 3 27352 0 0
+/app/imagine/01989d80-ac79-71cb-a1ac-1a28bed28c72 2 34022 0 0
+/admin/plans/new 1 12700 0 0
+/api/assistants/count 2 30 0 0
+/admin/status 11 65363 0 0
+/admin/users 1 11970 0 0
+/admin/api/plans/count 6 90 0 0
+/login 13 51818 3 4
+/admin/orders 2 17813 0 0
+/admin/users/01989cdb-a2cc-7237-b42b-f5d6e32d428b 1 9062 0 0
+/api/workspaces/01989cdb-a2cc-7237-b42b-f5d6e348c938/datasets/usage 10 60 0 0
+/api/assistants 1 31 0 0
+/api/ai/images 7 7839 0 0
+/app/imagine/ 6 97067 0 0
+/admin/update 1 7366 0 0
+/app/imagine/01989d6e-3867-714c-9253-0e4d22b0262b 8 136121 0 0
+/app/imagine/01989d7b-79bb-7398-9c7a-bedc2ac13f7e 1 17017 0 0
+/admin/settings/falai 2 12622 0 0
+/admin/settings/providers/runway 11 80644 0 0
+/app 10 83323 0 0
+/install 1 9967 1 0
+/app/assistants 1 9701 0 0
+/admin/api/reports/dataset/country 14 377 0 0
+/admin/api/plugins/heyaikeedo/runway/initialize 1 339 0 0
+/admin/settings/features 3 21176 0 0
+/admin/workspaces/01989cdb-a2cc-7237-b42b-f5d6e348c938 1 10734 0 0
+/api/library/images/count 14 210 0 0
+/admin/settings/features/chat 1 7671 0 0
+/admin/plans 2 18672 0 0
+/install/api/requirements 1 342 0 0
+// 1 5451 0 0
+/admin/settings/features/imagine 1 6737 0 0
+/en-US 1 5451 0 0
+/api/library/documents 10 310 0 0
+/admin/api/voices 1 31 0 0
+//admin/settings/providers/runway 4 29206 0 0
+/admin/settings/credits 1 10004 0 0
+/install/api/database 1 45 0 0
+/app/library/images 7 64438 0 0
+/admin/settings/pwa 1 7059 0 0
+END_SIDER
+
+# Payload Range - Payload Frequency
+BEGIN_FILESIZE 7
+1K-2K 358
+5K+ 967
+500-1K 93
+100-500 152
+44-100 4
+0-44 283
+2K-5K 271
+END_FILESIZE

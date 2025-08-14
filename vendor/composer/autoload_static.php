@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
+class ComposerStaticInite74b3cb752ed18db05a5d16184b3d27b
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -232,10 +232,9 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         ),
         'A' => 
         array (
-            'Aikeedo\\Runway\\' => 15,
             'Aikeedo\\Integrity\\' => 18,
-            'Aikeedo\\CurrencyBeacon\\' => 23,
             'Aikeedo\\Composer\\' => 17,
+            'Aikeedo\\ApiFrame\\' => 17,
             'Adbar\\' => 6,
         ),
     );
@@ -784,21 +783,17 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
-        'Aikeedo\\Runway\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/extra/extensions/heyaikeedo/runway/src',
-        ),
         'Aikeedo\\Integrity\\' => 
         array (
             0 => __DIR__ . '/..' . '/heyaikeedo/integrity/src',
         ),
-        'Aikeedo\\CurrencyBeacon\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/extra/extensions/heyaikeedo/currency-beacon/src',
-        ),
         'Aikeedo\\Composer\\' => 
         array (
             0 => __DIR__ . '/..' . '/heyaikeedo/composer/src',
+        ),
+        'Aikeedo\\ApiFrame\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/extra/extensions/heyaikeedo/apiframe/src',
         ),
         'Adbar\\' => 
         array (
@@ -1579,10 +1574,10 @@ class ComposerStaticInit51735aeaf329c774b2936df35e2dee16
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit51735aeaf329c774b2936df35e2dee16::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit51735aeaf329c774b2936df35e2dee16::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit51735aeaf329c774b2936df35e2dee16::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit51735aeaf329c774b2936df35e2dee16::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInite74b3cb752ed18db05a5d16184b3d27b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInite74b3cb752ed18db05a5d16184b3d27b::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInite74b3cb752ed18db05a5d16184b3d27b::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInite74b3cb752ed18db05a5d16184b3d27b::$classMap;
 
         }, null, ClassLoader::class);
     }

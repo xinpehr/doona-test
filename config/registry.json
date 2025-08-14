@@ -4488,6 +4488,12 @@
                     "enabled": true
                 }
             ]
+        },
+        {
+            "key": "ollama",
+            "name": "Ollama",
+            "server": null,
+            "models": []
         }
     ]
 }

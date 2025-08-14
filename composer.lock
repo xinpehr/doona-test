@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c9d8a5de731cba88c5a0e7babe16d61",
+    "content-hash": "9c88caf0dc103656b8d5c46386dd9d22",
     "packages": [
         {
             "name": "adbario/php-dot-notation",
@@ -3026,6 +3026,56 @@
             "time": "2025-03-27T12:30:47+00:00"
         },
         {
+            "name": "heyaikeedo/apiframe",
+            "version": "1.0.0",
+            "dist": {
+                "type": "zip",
+                "url": "extra/artifacts/689db9e4e8641.zip",
+                "shasum": "bc1313db1f5b6db5b73358e35324453822a5e9c7"
+            },
+            "require": {
+                "heyaikeedo/composer": "^1.0.0"
+            },
+            "type": "aikeedo-plugin",
+            "extra": {
+                "entry-class": "Aikeedo\\ApiFrame\\Plugin",
+                "status": "inactive",
+                "title": "APIFrame Midjourney",
+                "description": "Professional Midjourney API integration with support for versions 6.1 and 7",
+                "logo": "https://cdn.aikeedo.com/plugins/apiframe/logo.svg",
+                "icon": "https://cdn.aikeedo.com/plugins/apiframe/icon.svg"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Aikeedo\\ApiFrame\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aikeedo",
+                    "email": "hey@aikeedo.com",
+                    "homepage": "https://aikeedo.com",
+                    "role": "Owner"
+                }
+            ],
+            "description": "APIFrame Midjourney integration for Aikeedo",
+            "homepage": "https://aikeedo.com",
+            "support": {
+                "chat": "https://aikeedo.com/",
+                "docs": "https://docs.aikeedo.com/",
+                "email": "support@aikeedo.com",
+                "forum": "https://aikeedo.com/",
+                "issues": "https://github.com/heyaikeedo/plugins-apiframe/issues",
+                "rss": "https://aikeedo.com/",
+                "source": "https://github.com/heyaikeedo/plugins-apiframe",
+                "wiki": "https://docs.aikeedo.com/"
+            },
+            "time": "2024-12-19T00:00:00+00:00"
+        },
+        {
             "name": "heyaikeedo/composer",
             "version": "v1.1.0",
             "source": {
@@ -3086,56 +3136,6 @@
                 "source": "https://github.com/heyaikeedo/composer/tree/v1.1.0"
             },
             "time": "2025-03-04T14:23:00+00:00"
-        },
-        {
-            "name": "heyaikeedo/currency-beacon",
-            "version": "1.0.0",
-            "dist": {
-                "type": "zip",
-                "url": "extra/artifacts/689ae90762f18.zip",
-                "shasum": "2c3aea16b1a7289e6d628ca442e97ca3e216de17"
-            },
-            "require": {
-                "heyaikeedo/composer": "^1.0.0"
-            },
-            "type": "aikeedo-plugin",
-            "extra": {
-                "entry-class": "Aikeedo\\CurrencyBeacon\\Plugin",
-                "status": "active",
-                "title": "Currency Beacon",
-                "description": "Currency Beacon integration for Aikeedo",
-                "logo": "https://cdn.aikeedo.com/plugins/currency-beacon/logo.svg",
-                "icon": "https://cdn.aikeedo.com/plugins/currency-beacon/icon.svg"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Aikeedo\\CurrencyBeacon\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Aikeedo",
-                    "email": "hey@aikeedo.com",
-                    "homepage": "https://aikeedo.com",
-                    "role": "Owner"
-                }
-            ],
-            "description": "Currency Beacon integration for Aikeedo",
-            "homepage": "https://aikeedo.com",
-            "support": {
-                "chat": "https://aikeedo.com/",
-                "docs": "https://docs.aikeedo.com/",
-                "email": "support@aikeedo.com",
-                "forum": "https://aikeedo.com/",
-                "issues": "https://github.com/heyaikeedo/plugins-currency-beacon/issues",
-                "rss": "https://aikeedo.com/",
-                "source": "https://github.com/heyaikeedo/plugins-currency-beacon",
-                "wiki": "https://docs.aikeedo.com/"
-            },
-            "time": "2024-07-14T00:00:00+00:00"
         },
         {
             "name": "heyaikeedo/default",
@@ -3246,56 +3246,6 @@
                 "source": "https://github.com/heyaikeedo/integrity/tree/v1.0.1"
             },
             "time": "2024-05-17T07:34:13+00:00"
-        },
-        {
-            "name": "heyaikeedo/runway",
-            "version": "1.0.0",
-            "dist": {
-                "type": "zip",
-                "url": "extra/artifacts/689aee4ebec6b.zip",
-                "shasum": "f9e4afeb3797615844d769cd0d1c832512938efc"
-            },
-            "require": {
-                "heyaikeedo/composer": "^1.0.0"
-            },
-            "type": "aikeedo-plugin",
-            "extra": {
-                "entry-class": "Aikeedo\\Runway\\Plugin",
-                "status": "inactive",
-                "title": "Runway API",
-                "description": "Advanced AI video and image generation using Runway's cutting-edge models",
-                "logo": "https://cdn.aikeedo.com/plugins/runway/logo.svg",
-                "icon": "https://cdn.aikeedo.com/plugins/runway/icon.svg"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Aikeedo\\Runway\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Aikeedo",
-                    "email": "hey@aikeedo.com",
-                    "homepage": "https://aikeedo.com",
-                    "role": "Owner"
-                }
-            ],
-            "description": "Runway API integration for Aikeedo - Advanced AI video and image generation",
-            "homepage": "https://aikeedo.com",
-            "support": {
-                "chat": "https://aikeedo.com/",
-                "docs": "https://docs.aikeedo.com/",
-                "email": "support@aikeedo.com",
-                "forum": "https://aikeedo.com/",
-                "issues": "https://github.com/heyaikeedo/plugins-runway/issues",
-                "rss": "https://aikeedo.com/",
-                "source": "https://github.com/heyaikeedo/plugins-runway",
-                "wiki": "https://docs.aikeedo.com/"
-            },
-            "time": "2024-12-19T00:00:00+00:00"
         },
         {
             "name": "iziphp/autoloader",
