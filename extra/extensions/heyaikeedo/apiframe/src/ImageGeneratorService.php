@@ -193,8 +193,21 @@ class ImageGeneratorService implements ImageServiceInterface
                 if (isset($result['status'])) {
                     switch ($result['status']) {
                         case 'completed':
+                        case 'finished':
+                            // Handle both 'completed' and 'finished' status
                             if (isset($result['image_url'])) {
+                                error_log("APIFrame: Single image URL found");
                                 $this->handleImageResult($entity, $result['image_url']);
+                                return;
+                            } elseif (isset($result['image_urls']) && is_array($result['image_urls']) && !empty($result['image_urls'])) {
+                                // Use first image from array
+                                $imageUrl = $result['image_urls'][0];
+                                error_log("APIFrame: Multiple images found, using first: " . $imageUrl);
+                                $this->handleImageResult($entity, $imageUrl);
+                                return;
+                            } else {
+                                error_log("APIFrame: Task finished but no image URLs found");
+                                $entity->addMeta('apiframe_error', 'Task completed but no images returned');
                                 return;
                             }
                             break;
@@ -202,11 +215,13 @@ class ImageGeneratorService implements ImageServiceInterface
                         case 'failed':
                         case 'error':
                             $error = $result['error'] ?? 'Image generation failed';
+                            error_log("APIFrame: Task failed: " . $error);
                             $entity->addMeta('apiframe_error', $error);
                             return;
                             
                         case 'pending':
                         case 'processing':
+                        case 'starting':
                             // Continue polling
                             continue 2;
                     }
@@ -228,25 +243,38 @@ class ImageGeneratorService implements ImageServiceInterface
     private function handleImageResult(ImageEntity $entity, string $imageUrl): void
     {
         try {
+            error_log("APIFrame: handleImageResult called with URL: " . $imageUrl);
+            
             // Download and store the image
             $imageData = file_get_contents($imageUrl);
             if ($imageData === false) {
+                error_log("APIFrame: Failed to download image from URL: " . $imageUrl);
                 throw new DomainException('Failed to download image from APIFrame');
             }
+            
+            error_log("APIFrame: Image downloaded successfully, size: " . strlen($imageData) . " bytes");
             
             // Generate filename
             $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
             $filename = 'apiframe_' . $entity->getId()->getValue() . '.' . $extension;
             
+            error_log("APIFrame: Generated filename: " . $filename);
+            
             // Store in CDN
             $url = $this->cdn->upload($imageData, $filename);
+            
+            error_log("APIFrame: Image uploaded to CDN, URL: " . $url);
             
             // Update entity
             $entity->setOutputImageUrl($url);
             $entity->addMeta('apiframe_completed', true);
             $entity->addMeta('apiframe_original_url', $imageUrl);
             
+            error_log("APIFrame: Image processing completed successfully");
+            
         } catch (\Exception $e) {
+            error_log("APIFrame: Error in handleImageResult: " . $e->getMessage());
+            error_log("APIFrame: Exception trace: " . $e->getTraceAsString());
             $entity->addMeta('apiframe_error', 'Failed to process image: ' . $e->getMessage());
         }
     }
