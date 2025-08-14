@@ -35,8 +35,6 @@ class GenerateImageCommandHandler
     {
         ini_set('max_execution_time', '0');
         
-        error_log("GenerateImageCommandHandler: Starting image generation for model: " . $cmd->model->value);
-
         $ws = $cmd->workspace instanceof WorkspaceEntity
             ? $cmd->workspace
             : $this->wsRepo->ofId($cmd->workspace);
@@ -64,22 +62,12 @@ class GenerateImageCommandHandler
             $cmd->model
         );
 
-        error_log("GenerateImageCommandHandler: Calling service->generateImage");
-        
-        try {
-            $entity = $service->generateImage(
-                $ws,
-                $user,
-                $cmd->model,
-                $cmd->params
-            );
-            
-            error_log("GenerateImageCommandHandler: Entity created successfully with ID: " . $entity->getId()->getValue());
-        } catch (\Exception $e) {
-            error_log("GenerateImageCommandHandler: Exception in generateImage: " . $e->getMessage());
-            error_log("GenerateImageCommandHandler: Exception trace: " . $e->getTraceAsString());
-            throw $e;
-        }
+        $entity = $service->generateImage(
+            $ws,
+            $user,
+            $cmd->model,
+            $cmd->params
+        );
 
         if (
             is_null($entity->getTitle()->value)
