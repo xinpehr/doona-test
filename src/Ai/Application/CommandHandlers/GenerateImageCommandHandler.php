@@ -93,6 +93,9 @@ class GenerateImageCommandHandler
         }
 
         $this->repo->add($entity);
+        
+        // Flush immediately to persist entity to database
+        // This ensures the entity appears in library even during async processing
         $this->repo->flush();
 
         if ($entity->getCost()->value > 0) {
