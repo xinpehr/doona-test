@@ -34,6 +34,8 @@ class GenerateImageCommandHandler
     public function handle(GenerateImageCommand $cmd): ImageEntity
     {
         ini_set('max_execution_time', '0');
+        
+        error_log("GenerateImageCommandHandler: Starting image generation for model: " . $cmd->model->value);
 
         $ws = $cmd->workspace instanceof WorkspaceEntity
             ? $cmd->workspace
@@ -62,12 +64,22 @@ class GenerateImageCommandHandler
             $cmd->model
         );
 
-        $entity = $service->generateImage(
-            $ws,
-            $user,
-            $cmd->model,
-            $cmd->params
-        );
+        error_log("GenerateImageCommandHandler: Calling service->generateImage");
+        
+        try {
+            $entity = $service->generateImage(
+                $ws,
+                $user,
+                $cmd->model,
+                $cmd->params
+            );
+            
+            error_log("GenerateImageCommandHandler: Entity created successfully with ID: " . $entity->getId()->getValue());
+        } catch (\Exception $e) {
+            error_log("GenerateImageCommandHandler: Exception in generateImage: " . $e->getMessage());
+            error_log("GenerateImageCommandHandler: Exception trace: " . $e->getTraceAsString());
+            throw $e;
+        }
 
         if (
             is_null($entity->getTitle()->value)
@@ -92,11 +104,19 @@ class GenerateImageCommandHandler
             $entity->addCost($titleResp->cost);
         }
 
+        error_log("GenerateImageCommandHandler: Adding entity to repository");
         $this->repo->add($entity);
         
+        error_log("GenerateImageCommandHandler: Flushing repository to persist entity");
         // Flush immediately to persist entity to database
         // This ensures the entity appears in library even during async processing
-        $this->repo->flush();
+        try {
+            $this->repo->flush();
+            error_log("GenerateImageCommandHandler: Repository flushed successfully");
+        } catch (\Exception $e) {
+            error_log("GenerateImageCommandHandler: Exception during flush: " . $e->getMessage());
+            throw $e;
+        }
 
         if ($entity->getCost()->value > 0) {
             // Deduct credit from workspace
@@ -107,6 +127,7 @@ class GenerateImageCommandHandler
             $this->dispatcher->dispatch($event);
         }
 
+        error_log("GenerateImageCommandHandler: Returning entity with ID: " . $entity->getId()->getValue());
         return $entity;
     }
 }
