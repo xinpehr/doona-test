@@ -77,15 +77,11 @@ class ImageGeneratorService implements ImageServiceInterface
 
         $card = $this->models[$model->value];
         
-        // Calculate cost
-        $cost = $this->calc->calculate(1, $model);
-
         $entity = new ImageEntity(
             $workspace,
             $user,
             $model,
-            RequestParams::fromArray($params),
-            $cost
+            RequestParams::fromArray($params)
         );
         
         // Note: Don't set output file yet - will be set when image is ready (like FalAI)
@@ -361,11 +357,15 @@ class ImageGeneratorService implements ImageServiceInterface
                 
                 error_log("APIFrame: ImageFileEntity created successfully");
                 
+                // Calculate and add cost
+                $cost = $this->calc->calculate(1, $entity->getModel());
+                $entity->addCost($cost);
+                
                 // Set the file and complete the entity
                 $entity->setOutputFile($file);
                 $entity->setState(State::COMPLETED);
                 
-                error_log("APIFrame: Entity state set to COMPLETED");
+                error_log("APIFrame: Entity state set to COMPLETED with cost: " . $cost->value);
                 
                 imagedestroy($img);
                 
