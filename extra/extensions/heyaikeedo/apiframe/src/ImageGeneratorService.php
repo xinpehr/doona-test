@@ -76,7 +76,12 @@ class ImageGeneratorService implements ImageServiceInterface
         $card = $this->models[$model->value];
         
         // Calculate cost like other services
-        $cost = $this->calc->calculate(1, $model);
+        // Convert model name format for cost calculation (/ to -)
+        $costModelName = str_replace('/', '-', $model->value);
+        $costModel = new Model($costModelName);
+        $cost = $this->calc->calculate(1, $costModel);
+        error_log("APIFrame: Original model: " . $model->value);
+        error_log("APIFrame: Cost model: " . $costModelName);
         error_log("APIFrame: Calculated cost: " . $cost->value);
         
         $entity = new ImageEntity(
