@@ -133,17 +133,10 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_mode', $mode);
             $entity->addMeta('apiframe_status', 'pending');
 
-            error_log("APIFrame: Task submitted successfully. Starting immediate check...");
+            error_log("APIFrame: Task submitted successfully. Starting simple polling...");
             
-            // Try immediate check first (sometimes tasks complete quickly)
-            $this->checkTaskOnce($entity, $response['task_id']);
-            
-            // If not completed, start background polling
-            if ($entity->getState() === State::PROCESSING) {
-                error_log("APIFrame: Starting background polling for task: " . $response['task_id']);
-                // Fork a background process to poll the task
-                $this->startBackgroundPolling($entity, $response['task_id']);
-            }
+            // Start simple polling loop (blocking but with timeout)
+            $this->pollTask($entity, $response['task_id']);
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
@@ -241,237 +234,195 @@ class ImageGeneratorService implements ImageServiceInterface
     }
 
     /**
-     * Start background polling for the task
+     * Simple polling method - exactly as per APIFrame docs
      */
-    private function startBackgroundPolling(ImageEntity $entity, string $taskId): void
+    private function pollTask(ImageEntity $entity, string $taskId): void
     {
-        error_log("APIFrame: Background polling will be handled by frontend or cron job");
+        error_log("APIFrame: Starting polling for task: " . $taskId);
         
-        // For now, let's try one immediate check after a short delay
-        // Frontend will handle the main polling
-        
-        // Optional: Start a simple background check
-        $this->scheduleTaskCheck($entity, $taskId);
-    }
-    
-    /**
-     * Schedule a task check (can be improved with proper queue system)
-     */
-    private function scheduleTaskCheck(ImageEntity $entity, string $taskId): void
-    {
-        // For now, let's do a delayed check
-        // In production, this should be handled by a proper queue system
-        error_log("APIFrame: Scheduling delayed task check for: " . $taskId);
-        
-        // You can implement this better with:
-        // 1. Redis queue
-        // 2. Database queue table  
-        // 3. Cron job that checks pending tasks
-        // 4. Background worker process
-    }
-
-    /**
-     * Check task once immediately (non-blocking)
-     */
-    private function checkTaskOnce(ImageEntity $entity, string $taskId): void
-    {
-        try {
-            error_log("APIFrame: Checking task once: " . $taskId);
-            
-            $result = $this->client->fetch($taskId);
-            error_log("APIFrame: Immediate check result: " . json_encode($result));
-            
-            if (isset($result['status'])) {
-                switch ($result['status']) {
-                    case 'completed':
-                    case 'finished':
-                        // Handle completed task
-                        if (isset($result['image_url'])) {
-                            error_log("APIFrame: Single image URL found immediately");
-                            $this->handleImageResult($entity, $result['image_url']);
-                        } elseif (isset($result['image_urls']) && is_array($result['image_urls']) && !empty($result['image_urls'])) {
-                            $imageUrl = $result['image_urls'][0];
-                            error_log("APIFrame: Multiple images found immediately, using first: " . $imageUrl);
-                            $this->handleImageResult($entity, $imageUrl);
-                        }
-                        break;
-                        
-                    default:
-                        // Task not ready yet, just log and return
-                        error_log("APIFrame: Task not ready yet, status: " . $result['status']);
-                        $entity->addMeta('apiframe_status', $result['status']);
-                        break;
-                }
-            }
-            
-        } catch (\Exception $e) {
-            error_log("APIFrame: Error in immediate check: " . $e->getMessage());
-            // Don't throw, just log
-        }
-    }
-
-    /**
-     * Poll task result using APIFrame fetch endpoint (for background processing)
-     */
-    private function pollTaskResult(ImageEntity $entity, string $taskId): void
-    {
-        error_log("APIFrame: pollTaskResult started for task: " . $taskId);
-        
-        $maxAttempts = 24; // Max 2 minutes (24 * 5 seconds)
+        $maxAttempts = 24; // 2 minutes max (24 * 5 seconds)
         $attempt = 0;
         
         while ($attempt < $maxAttempts) {
+            $attempt++;
+            
+            // Wait 5 seconds between polls (as recommended)
+            if ($attempt > 1) {
+                sleep(5);
+            }
+            
+            error_log("APIFrame: Polling attempt $attempt/$maxAttempts for task: " . $taskId);
+            
             try {
-                sleep(5); // Wait 5 seconds between polls
-                $attempt++;
-                
-                error_log("APIFrame: Polling attempt $attempt for task: " . $taskId);
-                
+                // Call fetch API exactly as per docs
                 $result = $this->client->fetch($taskId);
-                error_log("APIFrame: Fetch result: " . json_encode($result));
+                error_log("APIFrame: Fetch response: " . json_encode($result));
                 
-                if (isset($result['status'])) {
-                    switch ($result['status']) {
-                        case 'completed':
-                        case 'finished':
-                            // Handle both 'completed' and 'finished' status
-                            if (isset($result['image_url'])) {
-                                error_log("APIFrame: Single image URL found");
-                                $this->handleImageResult($entity, $result['image_url']);
-                                return;
-                            } elseif (isset($result['image_urls']) && is_array($result['image_urls']) && !empty($result['image_urls'])) {
-                                // Use first image from array
-                                $imageUrl = $result['image_urls'][0];
-                                error_log("APIFrame: Multiple images found, using first: " . $imageUrl);
-                                $this->handleImageResult($entity, $imageUrl);
-                                return;
-                            } else {
-                                error_log("APIFrame: Task finished but no image URLs found");
-                                $entity->addMeta('apiframe_error', 'Task completed but no images returned');
-                                return;
-                            }
-                            break;
-                            
-                        case 'failed':
-                        case 'error':
-                            $error = $result['error'] ?? 'Image generation failed';
-                            error_log("APIFrame: Task failed: " . $error);
-                            $entity->addMeta('apiframe_error', $error);
-                            $entity->setState(State::FAILED);
-                            return;
-                            
-                        case 'pending':
-                        case 'processing':
-                        case 'starting':
-                            // Continue polling
-                            continue 2;
-                    }
+                // Check status according to APIFrame docs
+                if (!isset($result['status'])) {
+                    error_log("APIFrame: No status in response, continuing...");
+                    continue;
+                }
+                
+                $status = $result['status'];
+                error_log("APIFrame: Task status: " . $status);
+                
+                // Handle different statuses
+                switch ($status) {
+                    case 'completed':
+                    case 'finished':
+                        error_log("APIFrame: Task completed! Processing result...");
+                        $this->handleCompletedTask($entity, $result);
+                        return; // Exit polling
+                        
+                    case 'failed':
+                    case 'error':
+                        error_log("APIFrame: Task failed!");
+                        $this->handleFailedTask($entity, $result);
+                        return; // Exit polling
+                        
+                    case 'processing':
+                    case 'pending':
+                    case 'queued':
+                        $progress = $result['percentage'] ?? 'unknown';
+                        error_log("APIFrame: Task still processing... Progress: " . $progress);
+                        continue; // Continue polling
+                        
+                    default:
+                        error_log("APIFrame: Unknown status: " . $status . ", continuing...");
+                        continue;
                 }
                 
             } catch (\Exception $e) {
-                // Continue polling on error
+                error_log("APIFrame: Polling error (attempt $attempt): " . $e->getMessage());
+                // Continue polling even on error (might be temporary)
                 continue;
             }
         }
         
         // Timeout reached
-        error_log("APIFrame: Polling timeout for task: " . $taskId);
-        $entity->addMeta('apiframe_error', 'Task timeout after 2 minutes');
+        error_log("APIFrame: Polling timeout reached for task: " . $taskId);
+        $entity->addMeta('apiframe_error', 'Polling timeout after 2 minutes');
         $entity->setState(State::FAILED);
     }
     
     /**
-     * Handle successful image result
+     * Handle completed task - exactly as per APIFrame docs
      */
-    private function handleImageResult(ImageEntity $entity, string $imageUrl): void
+    private function handleCompletedTask(ImageEntity $entity, array $result): void
     {
+        error_log("APIFrame: Processing completed task...");
+        
+        // According to APIFrame docs, completed response has:
+        // "image_urls": ["url1", "url2", "url3", "url4"]
+        // or "original_image_url": "grid_url"
+        
+        $imageUrl = null;
+        
+        // Try image_urls array first (most common)
+        if (isset($result['image_urls']) && is_array($result['image_urls']) && !empty($result['image_urls'])) {
+            $imageUrl = $result['image_urls'][0]; // Use first image
+            error_log("APIFrame: Found image_urls, using first: " . $imageUrl);
+        }
+        // Try single image_url
+        elseif (isset($result['image_url'])) {
+            $imageUrl = $result['image_url'];
+            error_log("APIFrame: Found single image_url: " . $imageUrl);
+        }
+        // Try original_image_url (grid)
+        elseif (isset($result['original_image_url'])) {
+            $imageUrl = $result['original_image_url'];
+            error_log("APIFrame: Found original_image_url: " . $imageUrl);
+        }
+        else {
+            error_log("APIFrame: No image URLs found in completed response: " . json_encode($result));
+            $entity->addMeta('apiframe_error', 'No image URLs in completed response');
+            $entity->setState(State::FAILED);
+            return;
+        }
+        
+        // Process the image
+        $this->processImageFromUrl($entity, $imageUrl);
+    }
+    
+    /**
+     * Handle failed task
+     */
+    private function handleFailedTask(ImageEntity $entity, array $result): void
+    {
+        $error = $result['error'] ?? $result['message'] ?? 'Task failed';
+        error_log("APIFrame: Task failed with error: " . $error);
+        
+        $entity->addMeta('apiframe_error', $error);
+        $entity->setState(State::FAILED);
+    }
+    
+    /**
+     * Process image from URL
+     */
+    private function processImageFromUrl(ImageEntity $entity, string $imageUrl): void
+    {
+        error_log("APIFrame: Downloading image from: " . $imageUrl);
+        
         try {
-            error_log("APIFrame: handleImageResult called with URL: " . $imageUrl);
-            
-            // Download and store the image
+            // Download image
             $imageData = file_get_contents($imageUrl);
             if ($imageData === false) {
-                error_log("APIFrame: Failed to download image from URL: " . $imageUrl);
-                throw new DomainException('Failed to download image from APIFrame');
+                throw new \Exception('Failed to download image from URL: ' . $imageUrl);
             }
             
-            error_log("APIFrame: Image downloaded successfully, size: " . strlen($imageData) . " bytes");
+            error_log("APIFrame: Image downloaded, size: " . strlen($imageData) . " bytes");
             
-            // Generate proper CDN path
+            // Create image resource for dimensions
+            $img = imagecreatefromstring($imageData);
+            if ($img === false) {
+                throw new \Exception('Invalid image data');
+            }
+            
+            $width = imagesx($img);
+            $height = imagesy($img);
+            error_log("APIFrame: Image dimensions: {$width}x{$height}");
+            
+            // Generate CDN path
             $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
             $name = $this->cdn->generatePath($extension, $entity->getWorkspace(), $entity->getUser());
             
-            error_log("APIFrame: Generated CDN path: " . $name);
+            // Upload to CDN
+            $this->cdn->write($name, $imageData);
+            $cdnUrl = $this->cdn->getUrl($name);
+            error_log("APIFrame: Image uploaded to CDN: " . $cdnUrl);
             
-            // Store in CDN
-            try {
-                $this->cdn->write($name, $imageData);
-                $cdnUrl = $this->cdn->getUrl($name);
-                error_log("APIFrame: Image uploaded to CDN, URL: " . $cdnUrl);
-            } catch (\Exception $e) {
-                error_log("APIFrame: CDN upload failed: " . $e->getMessage());
-                throw new DomainException('Failed to upload image to CDN: ' . $e->getMessage());
-            }
+            // Create ImageFileEntity
+            $file = new ImageFileEntity(
+                new Storage($this->cdn->getAdapterLookupKey()),
+                new ObjectKey($name),
+                new Url($cdnUrl),
+                new Size(strlen($imageData)),
+                new Width($width),
+                new Height($height),
+                BlurHashGenerator::generateBlurHash($img, $width, $height)
+            );
             
-            // Create image resource for getting dimensions and blur hash
-            try {
-                $img = imagecreatefromstring($imageData);
-                if ($img === false) {
-                    throw new DomainException('Invalid image data');
-                }
-                
-                $width = imagesx($img);
-                $height = imagesy($img);
-                
-                error_log("APIFrame: Image dimensions: {$width}x{$height}");
-                
-                // Create ImageFileEntity
-                $file = new ImageFileEntity(
-                    new Storage($this->cdn->getAdapterLookupKey()),
-                    new ObjectKey($name),
-                    new Url($cdnUrl),
-                    new Size(strlen($imageData)),
-                    new Width($width),
-                    new Height($height),
-                    BlurHashGenerator::generateBlurHash($img, $width, $height)
-                );
-                
-                error_log("APIFrame: ImageFileEntity created successfully");
-                
-                // Calculate and add cost
-                $cost = $this->calc->calculate(1, $entity->getModel());
-                $entity->addCost($cost);
-                
-                // Set the file and complete the entity
-                $entity->setOutputFile($file);
-                $entity->setState(State::COMPLETED);
-                
-                error_log("APIFrame: Entity state set to COMPLETED with cost: " . $cost->value);
-                
-                imagedestroy($img);
-                
-            } catch (\Exception $e) {
-                error_log("APIFrame: Image processing failed: " . $e->getMessage());
-                throw new DomainException('Failed to process image: ' . $e->getMessage());
-            }
+            // Calculate cost
+            $cost = $this->calc->calculate(1, $entity->getModel());
+            $entity->addCost($cost);
             
-            try {
-                $entity->addMeta('apiframe_completed', true);
-                $entity->addMeta('apiframe_original_url', $imageUrl);
-                error_log("APIFrame: Meta data added successfully");
-            } catch (\Exception $e) {
-                error_log("APIFrame: Adding meta failed: " . $e->getMessage());
-                throw new DomainException('Failed to add metadata: ' . $e->getMessage());
-            }
+            // Complete the entity
+            $entity->setOutputFile($file);
+            $entity->setState(State::COMPLETED);
             
-            error_log("APIFrame: Image processing completed successfully");
+            error_log("APIFrame: Task completed successfully! Cost: " . $cost->value);
+            
+            imagedestroy($img);
             
         } catch (\Exception $e) {
-            error_log("APIFrame: Error in handleImageResult: " . $e->getMessage());
-            error_log("APIFrame: Exception trace: " . $e->getTraceAsString());
-            $entity->addMeta('apiframe_error', 'Failed to process image: ' . $e->getMessage());
+            error_log("APIFrame: Error processing image: " . $e->getMessage());
+            $entity->addMeta('apiframe_error', 'Image processing failed: ' . $e->getMessage());
+            $entity->setState(State::FAILED);
         }
     }
+
+
 
 
 }
