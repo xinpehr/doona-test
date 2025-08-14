@@ -124,11 +124,15 @@ class ImageGeneratorService implements ImageServiceInterface
             throw new DomainException('Failed to generate image: ' . $e->getMessage());
         }
 
+        error_log("APIFrame: About to return entity...");
         error_log("APIFrame: Returning entity with ID: " . $entity->getId()->getValue());
         error_log("APIFrame: Entity state: " . $entity->getState()->value);
         error_log("APIFrame: Entity cost: " . $entity->getCost()->value);
         error_log("APIFrame: Entity output file: " . ($entity->getOutputFile() ? 'SET' : 'NULL'));
         error_log("APIFrame: Entity title: " . ($entity->getTitle()->value ?? 'NULL'));
+        error_log("APIFrame: Entity workspace: " . $entity->getWorkspace()->getId()->getValue());
+        error_log("APIFrame: Entity user: " . $entity->getUser()->getId()->getValue());
+        error_log("APIFrame: Successfully returning entity to command handler");
         
         return $entity;
     }
