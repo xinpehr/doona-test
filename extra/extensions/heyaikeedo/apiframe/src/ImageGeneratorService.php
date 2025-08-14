@@ -9,8 +9,18 @@ use Ai\Domain\Exceptions\DomainException;
 use Ai\Domain\Image\ImageServiceInterface;
 use Ai\Domain\ValueObjects\Model;
 use Ai\Domain\ValueObjects\RequestParams;
+use Ai\Domain\ValueObjects\State;
 use Ai\Infrastructure\Services\CostCalculator;
 use Easy\Container\Attributes\Inject;
+use File\Domain\Entities\ImageFileEntity;
+use File\Domain\ValueObjects\BlurHash;
+use File\Domain\ValueObjects\Height;
+use File\Domain\ValueObjects\ObjectKey;
+use File\Domain\ValueObjects\Size;
+use File\Domain\ValueObjects\Storage;
+use File\Domain\ValueObjects\Url;
+use File\Domain\ValueObjects\Width;
+use File\Infrastructure\BlurHashGenerator;
 use Override;
 use Shared\Infrastructure\FileSystem\CdnInterface;
 use Shared\Infrastructure\Services\ModelRegistry;
@@ -108,10 +118,18 @@ class ImageGeneratorService implements ImageServiceInterface
             // Store task information in entity metadata
             $entity->addMeta('apiframe_task_id', $response['task_id']);
             $entity->addMeta('apiframe_mode', $mode);
+            $entity->addMeta('apiframe_status', 'pending');
 
             error_log("APIFrame: Starting immediate check for task: " . $response['task_id']);
             // Check once immediately, don't block the request
             $this->checkTaskOnce($entity, $response['task_id']);
+
+            // If still pending after immediate check, set a placeholder
+            if (!$entity->getOutputImageUrl()) {
+                error_log("APIFrame: No image ready yet, task is still processing");
+                $entity->addMeta('apiframe_pending', true);
+                // Don't set output URL yet - let it remain null until image is ready
+            }
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
@@ -120,6 +138,9 @@ class ImageGeneratorService implements ImageServiceInterface
             throw new DomainException('Failed to generate image: ' . $e->getMessage());
         }
 
+        error_log("APIFrame: Returning entity with ID: " . $entity->getId()->getValue());
+        error_log("APIFrame: Entity output URL: " . ($entity->getOutputImageUrl() ?: 'NULL'));
+        
         return $entity;
     }
 
@@ -302,20 +323,50 @@ class ImageGeneratorService implements ImageServiceInterface
             
             // Store in CDN
             try {
-                $url = $this->cdn->upload($imageData, $filename);
-                error_log("APIFrame: Image uploaded to CDN, URL: " . $url);
+                $this->cdn->write($filename, $imageData);
+                $cdnUrl = $this->cdn->getUrl($filename);
+                error_log("APIFrame: Image uploaded to CDN, URL: " . $cdnUrl);
             } catch (\Exception $e) {
                 error_log("APIFrame: CDN upload failed: " . $e->getMessage());
                 throw new DomainException('Failed to upload image to CDN: ' . $e->getMessage());
             }
             
-            // Update entity
+            // Create image resource for getting dimensions and blur hash
             try {
-                $entity->setOutputImageUrl($url);
-                error_log("APIFrame: setOutputImageUrl called successfully");
+                $img = imagecreatefromstring($imageData);
+                if ($img === false) {
+                    throw new DomainException('Invalid image data');
+                }
+                
+                $width = imagesx($img);
+                $height = imagesy($img);
+                
+                error_log("APIFrame: Image dimensions: {$width}x{$height}");
+                
+                // Create ImageFileEntity
+                $file = new ImageFileEntity(
+                    new Storage($this->cdn->getAdapterLookupKey()),
+                    new ObjectKey($filename),
+                    new Url($cdnUrl),
+                    new Size(strlen($imageData)),
+                    new Width($width),
+                    new Height($height),
+                    BlurHashGenerator::generateBlurHash($img, $width, $height)
+                );
+                
+                error_log("APIFrame: ImageFileEntity created successfully");
+                
+                // Set the file and complete the entity
+                $entity->setOutputFile($file);
+                $entity->setState(State::COMPLETED);
+                
+                error_log("APIFrame: Entity state set to COMPLETED");
+                
+                imagedestroy($img);
+                
             } catch (\Exception $e) {
-                error_log("APIFrame: setOutputImageUrl failed: " . $e->getMessage());
-                throw new DomainException('Failed to set output image URL: ' . $e->getMessage());
+                error_log("APIFrame: Image processing failed: " . $e->getMessage());
+                throw new DomainException('Failed to process image: ' . $e->getMessage());
             }
             
             try {
