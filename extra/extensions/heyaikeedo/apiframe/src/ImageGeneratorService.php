@@ -62,6 +62,7 @@ class ImageGeneratorService implements ImageServiceInterface
         ?array $params = null
     ): ImageEntity {
         error_log("APIFrame: Generating image with model: " . $model->value);
+        error_log("APIFrame: Received params: " . json_encode($params));
         
         if (!$params || !array_key_exists('prompt', $params)) {
             error_log("APIFrame: Missing prompt parameter");
@@ -104,18 +105,24 @@ class ImageGeneratorService implements ImageServiceInterface
         // Override mode if specified in params
         if (isset($params['mode']) && in_array($params['mode'], ['fast', 'turbo'])) {
             $mode = $params['mode'];
+            error_log("APIFrame: Mode overridden from params: " . $mode);
         }
+        error_log("APIFrame: Final mode: " . $mode);
 
         // Extract aspect ratio if provided
         $aspectRatio = null;
         if (isset($params['aspect_ratio'])) {
             $aspectRatio = $params['aspect_ratio'];
+            error_log("APIFrame: Aspect ratio from params: " . $aspectRatio);
         }
+        error_log("APIFrame: Final aspect ratio: " . ($aspectRatio ?? 'null'));
 
         // Prepare prompt with style if provided
         $prompt = $params['prompt'];
+        $originalPrompt = $prompt;
         if (isset($params['style']) && !empty($params['style'])) {
             $style = $params['style'];
+            error_log("APIFrame: Style from params: " . $style);
             switch ($style) {
                 case 'raw':
                     $prompt .= ' --style raw';
@@ -131,6 +138,8 @@ class ImageGeneratorService implements ImageServiceInterface
                     break;
             }
         }
+        error_log("APIFrame: Original prompt: " . $originalPrompt);
+        error_log("APIFrame: Final prompt: " . $prompt);
 
         try {
             // Send imagine request to APIFrame

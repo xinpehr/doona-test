@@ -103,7 +103,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     ],
                     'config' => [
                         'mode' => 'fast',
-                        'prompt_length' => 4000,
+                        'prompt_length' => 1000,
                         'negative_prompt' => false,
                         'supported_formats' => ['png', 'jpg', 'webp'],
                         'images' => [
@@ -201,7 +201,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     ],
                     'config' => [
                         'mode' => 'fast',
-                        'prompt_length' => 4000,
+                        'prompt_length' => 1000,
                         'negative_prompt' => false,
                         'supported_formats' => ['png', 'jpg', 'webp'],
                         'images' => [

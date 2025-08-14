@@ -123,6 +123,8 @@ class Client
             $body['aspect_ratio'] = $aspectRatio;
         }
 
+        error_log("APIFrame Client: Sending request body: " . json_encode($body));
+        
         $resp = $this->sendRequest('POST', '/pro/imagine', $body);
         $content = $resp->getBody()->getContents();
         

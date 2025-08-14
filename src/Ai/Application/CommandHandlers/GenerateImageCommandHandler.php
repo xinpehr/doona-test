@@ -64,6 +64,8 @@ class GenerateImageCommandHandler
 
         try {
             error_log("GenerateImageCommandHandler: Calling service->generateImage");
+            error_log("GenerateImageCommandHandler: Model: " . $cmd->model->value);
+            error_log("GenerateImageCommandHandler: Params: " . json_encode($cmd->params));
             $entity = $service->generateImage(
                 $ws,
                 $user,
