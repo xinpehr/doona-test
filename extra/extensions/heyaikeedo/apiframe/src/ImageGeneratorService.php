@@ -84,6 +84,10 @@ class ImageGeneratorService implements ImageServiceInterface
             RequestParams::fromArray($params),
         );
 
+        // Set initial state as PROCESSING so it appears in archive
+        $entity->setState(State::PROCESSING);
+        error_log("APIFrame: Entity state set to PROCESSING");
+
         // Determine mode from model configuration
         $mode = 'fast'; // default
         if (isset($card['config']['mode'])) {
@@ -120,16 +124,9 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_mode', $mode);
             $entity->addMeta('apiframe_status', 'pending');
 
-            error_log("APIFrame: Starting immediate check for task: " . $response['task_id']);
-            // Check once immediately, don't block the request
-            $this->checkTaskOnce($entity, $response['task_id']);
-
-            // If still pending after immediate check, set a placeholder
-            if (!$entity->getOutputImageUrl()) {
-                error_log("APIFrame: No image ready yet, task is still processing");
-                $entity->addMeta('apiframe_pending', true);
-                // Don't set output URL yet - let it remain null until image is ready
-            }
+            error_log("APIFrame: Starting polling for task: " . $response['task_id']);
+            // Use full polling mechanism
+            $this->pollTaskResult($entity, $response['task_id']);
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
@@ -238,7 +235,7 @@ class ImageGeneratorService implements ImageServiceInterface
     {
         error_log("APIFrame: pollTaskResult started for task: " . $taskId);
         
-        $maxAttempts = 60; // Max 5 minutes (60 * 5 seconds)
+        $maxAttempts = 24; // Max 2 minutes (24 * 5 seconds)
         $attempt = 0;
         
         while ($attempt < $maxAttempts) {
@@ -278,6 +275,7 @@ class ImageGeneratorService implements ImageServiceInterface
                             $error = $result['error'] ?? 'Image generation failed';
                             error_log("APIFrame: Task failed: " . $error);
                             $entity->addMeta('apiframe_error', $error);
+                            $entity->setState(State::FAILED);
                             return;
                             
                         case 'pending':
@@ -295,7 +293,9 @@ class ImageGeneratorService implements ImageServiceInterface
         }
         
         // Timeout reached
-        $entity->addMeta('apiframe_error', 'Task timeout after 5 minutes');
+        error_log("APIFrame: Polling timeout for task: " . $taskId);
+        $entity->addMeta('apiframe_error', 'Task timeout after 2 minutes');
+        $entity->setState(State::FAILED);
     }
     
     /**
