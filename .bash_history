@@ -146,3 +146,11 @@ git commit -m "Changes"
 git push origin main
 #1755167437
 git status
+#1755167444
+git add .
+#1755167451
+git commit -m "up"
+#1755167457
+git push origin main
+#1755167493
+git status

@@ -188,3 +188,5 @@ ehthumbs.db
 .npm/
 **/.nvm/
 **/.npm/
+
+.env.git
