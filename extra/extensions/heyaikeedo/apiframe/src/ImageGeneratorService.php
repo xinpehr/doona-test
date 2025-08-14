@@ -75,11 +75,16 @@ class ImageGeneratorService implements ImageServiceInterface
 
         $card = $this->models[$model->value];
         
+        // Calculate cost like other services
+        $cost = $this->calc->calculate(1, $model);
+        error_log("APIFrame: Calculated cost: " . $cost->value);
+        
         $entity = new ImageEntity(
             $workspace,
             $user,
             $model,
-            RequestParams::fromArray($params)
+            RequestParams::fromArray($params),
+            $cost
         );
         
         // Set initial state as PROCESSING so it appears in archive
@@ -356,15 +361,8 @@ class ImageGeneratorService implements ImageServiceInterface
                 error_log("APIFrame: Width: " . $width);
                 error_log("APIFrame: Height: " . $height);
                 
-                error_log("APIFrame: Generating BlurHash...");
-                try {
-                    $blurHash = BlurHashGenerator::generateBlurHash($img, $width, $height);
-                    error_log("APIFrame: BlurHash generated: " . $blurHash);
-                } catch (\Exception $e) {
-                    error_log("APIFrame: BlurHash generation failed: " . $e->getMessage());
-                    error_log("APIFrame: Using default BlurHash");
-                    $blurHash = 'L9Fj^kS6WA%L~pi^R*j[*7Z~oLxu'; // Default blur hash
-                }
+                error_log("APIFrame: Skipping BlurHash generation (potential timeout issue)");
+                $blurHash = 'L9Fj^kS6WA%L~pi^R*j[*7Z~oLxu'; // Default blur hash for now
                 
                 $file = new ImageFileEntity(
                     new Storage($this->cdn->getAdapterLookupKey()),
