@@ -280,105 +280,32 @@
           </template>
 
           <template x-if="preview.output_file">
-            <!-- Check if this is an APIFrame image with multiple variations -->
-            <template x-if="preview.metadata && preview.metadata.apiframe_processed_images">
-              <div x-data="{ selectedImage: 0, allImages: JSON.parse(preview.metadata.apiframe_processed_images || '[]') }">
-                <!-- Image Gallery -->
-                <div class="p-1 rounded-3xl border group border-line">
-                  <div class="relative rounded-[20px] bg-line-dimmed">
-                    <template x-if="preview.output_file.blur_hash">
-                      <canvas is="x-blurhash"
-                        class="absolute top-0 left-0 w-full h-full rounded-[20px] loading"
-                        :width="16" :height="9"
-                        :hash="preview.output_file.blur_hash"></canvas>
-                    </template>
+            <div class="p-1 rounded-3xl border group border-line">
+              <div class="relative rounded-[20px] bg-line-dimmed">
+                <template x-if="preview.output_file.blur_hash">
+                  <canvas is="x-blurhash"
+                    class="absolute top-0 left-0 w-full h-full rounded-[20px] loading"
+                    :width="16" :height="9"
+                    :hash="preview.output_file.blur_hash"></canvas>
+                </template>
 
-                    <!-- Show selected image (main image for index 0, or selected variation) -->
-                    <img :src="selectedImage === 0 ? preview.output_file.url : allImages[selectedImage - 1]?.cdn_url"
-                      :alt="preview.params.prompt || ''"
-                      class="object-cover relative rounded-[20px] w-full"
-                      :width="preview.output_file.width"
-                      :height="preview.output_file.height">
+                <img :src="preview.output_file.url"
+                  :alt="preview.params.prompt || ''"
+                  class="object-cover relative rounded-[20px] w-full"
+                  :width="preview.output_file.width"
+                  :height="preview.output_file.height">
 
-                    <div
-                      class="absolute top-0 left-0 w-full h-full via-transparent to-transparent opacity-0 transition-all bg-linear-to-bl from-main group-hover:opacity-50">
-                    </div>
-
-                    <a :href="selectedImage === 0 ? preview.output_file.url : allImages[selectedImage - 1]?.cdn_url" target="_blank"
-                      x-tooltip.raw="{{ __('Open in full size') }}"
-                      class="absolute top-0 right-0 opacity-0 transition-all scale-90 text-content group-hover:opacity-100 group-hover:scale-100 group-hover:top-2 group-hover:right-2">
-                      <i class="text-4xl ti ti-arrow-up-right"></i>
-                    </a>
-                  </div>
+                <div
+                  class="absolute top-0 left-0 w-full h-full via-transparent to-transparent opacity-0 transition-all bg-linear-to-bl from-main group-hover:opacity-50">
                 </div>
 
-                <!-- Image Thumbnails Navigation -->
-                <div class="flex gap-2 mt-4 justify-center">
-                  <!-- Main image thumbnail -->
-                  <button @click="selectedImage = 0"
-                    class="w-16 h-16 rounded-lg border-2 overflow-hidden transition-all"
-                    :class="selectedImage === 0 ? 'border-accent' : 'border-line-dimmed hover:border-line'">
-                    <img :src="preview.output_file.url" 
-                      class="w-full h-full object-cover" :alt="'{{ __('Image') }} 1'">
-                  </button>
-
-                  <!-- Variation thumbnails -->
-                  <template x-for="(image, index) in allImages" :key="index">
-                    <button @click="selectedImage = index + 1"
-                      class="w-16 h-16 rounded-lg border-2 overflow-hidden transition-all"
-                      :class="selectedImage === index + 1 ? 'border-accent' : 'border-line-dimmed hover:border-line'">
-                      <img :src="image.cdn_url" 
-                        class="w-full h-full object-cover" :alt="`{{ __('Image') }} ${index + 2}`">
-                    </button>
-                  </template>
-                </div>
-
-                <!-- Image Counter and Actions -->
-                <div class="text-center mt-2 text-xs text-content-dimmed">
-                  <span x-text="`{{ __('Image') }} ${selectedImage + 1} {{ __('of') }} ${allImages.length + 1}`"></span>
-                </div>
-
-                <!-- Download button for selected image -->
-                <div class="flex justify-center mt-3">
-                  <a :href="selectedImage === 0 ? preview.output_file.url : allImages[selectedImage - 1]?.cdn_url"
-                    download="image.png" target="_blank"
-                    class="flex items-center gap-2 px-4 py-2 text-sm bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-all">
-                    <i class="ti ti-download"></i>
-                    {{ __('Download Selected Image') }}
-                  </a>
-                </div>
+                <a :href="preview.output_file.url" target="_blank"
+                  x-tooltip.raw="{{ __('Open in full size') }}"
+                  class="absolute top-0 right-0 opacity-0 transition-all scale-90 text-content group-hover:opacity-100 group-hover:scale-100 group-hover:top-2 group-hover:right-2">
+                  <i class="text-4xl ti ti-arrow-up-right"></i>
+                </a>
               </div>
-            </template>
-
-            <!-- Regular single image display (for non-APIFrame images) -->
-            <template x-if="!preview.metadata || !preview.metadata.apiframe_processed_images">
-              <div class="p-1 rounded-3xl border group border-line">
-                <div class="relative rounded-[20px] bg-line-dimmed">
-                  <template x-if="preview.output_file.blur_hash">
-                    <canvas is="x-blurhash"
-                      class="absolute top-0 left-0 w-full h-full rounded-[20px] loading"
-                      :width="16" :height="9"
-                      :hash="preview.output_file.blur_hash"></canvas>
-                  </template>
-
-                  <img :src="preview.output_file.url"
-                    :alt="preview.params.prompt || ''"
-                    class="object-cover relative rounded-[20px] w-full"
-                    :width="preview.output_file.width"
-                    :height="preview.output_file.height">
-
-                  <div
-                    class="absolute top-0 left-0 w-full h-full via-transparent to-transparent opacity-0 transition-all bg-linear-to-bl from-main group-hover:opacity-50">
-                  </div>
-
-                  <a :href="preview.output_file.url" target="_blank"
-                    x-tooltip.raw="{{ __('Open in full size') }}"
-                    class="absolute top-0 right-0 opacity-0 transition-all scale-90 text-content group-hover:opacity-100 group-hover:scale-100 group-hover:top-2 group-hover:right-2">
-                    <i class="text-4xl ti ti-arrow-up-right"></i>
-                  </a>
-                </div>
-              </div>
-            </template>
+            </div>
           </template>
 
           <template x-if="preview.params.prompt">
