@@ -51,11 +51,17 @@ class ImageGeneratorService implements ImageServiceInterface
         Model $model,
         ?array $params = null
     ): ImageEntity {
+        error_log("APIFrame: generateImage called - Start");
+        error_log("APIFrame: Model: " . $model->value);
+        error_log("APIFrame: Params: " . json_encode($params));
+        
         if (!$params || !array_key_exists('prompt', $params)) {
+            error_log("APIFrame: Missing prompt parameter");
             throw new DomainException('Missing parameter: prompt');
         }
 
         if (!$this->supportsModel($model)) {
+            error_log("APIFrame: Model not supported: " . $model->value);
             throw new DomainException('Model not supported: ' . $model->value);
         }
 
@@ -80,24 +86,37 @@ class ImageGeneratorService implements ImageServiceInterface
         }
 
         try {
+            error_log("APIFrame: About to call imagine API");
+            error_log("APIFrame: Prompt: " . $params['prompt']);
+            error_log("APIFrame: Mode: " . $mode);
+            
             // Send imagine request to APIFrame
             $response = $this->client->imagine(
                 $params['prompt'],
                 $mode
             );
 
+            error_log("APIFrame: API Response: " . json_encode($response));
+
             if (!isset($response['task_id'])) {
+                error_log("APIFrame: Invalid response - no task_id");
                 throw new DomainException('Invalid response from APIFrame API');
             }
+
+            error_log("APIFrame: Task ID received: " . $response['task_id']);
 
             // Store task information in entity metadata
             $entity->addMeta('apiframe_task_id', $response['task_id']);
             $entity->addMeta('apiframe_mode', $mode);
 
+            error_log("APIFrame: Starting polling for task: " . $response['task_id']);
             // Start polling for result
             $this->pollTaskResult($entity, $response['task_id']);
 
         } catch (\Exception $e) {
+            error_log("APIFrame: Exception occurred: " . $e->getMessage());
+            error_log("APIFrame: Exception class: " . get_class($e));
+            error_log("APIFrame: Exception trace: " . $e->getTraceAsString());
             throw new DomainException('Failed to generate image: ' . $e->getMessage());
         }
 
@@ -156,6 +175,8 @@ class ImageGeneratorService implements ImageServiceInterface
      */
     private function pollTaskResult(ImageEntity $entity, string $taskId): void
     {
+        error_log("APIFrame: pollTaskResult started for task: " . $taskId);
+        
         $maxAttempts = 60; // Max 5 minutes (60 * 5 seconds)
         $attempt = 0;
         
@@ -164,7 +185,10 @@ class ImageGeneratorService implements ImageServiceInterface
                 sleep(5); // Wait 5 seconds between polls
                 $attempt++;
                 
+                error_log("APIFrame: Polling attempt $attempt for task: " . $taskId);
+                
                 $result = $this->client->fetch($taskId);
+                error_log("APIFrame: Fetch result: " . json_encode($result));
                 
                 if (isset($result['status'])) {
                     switch ($result['status']) {
