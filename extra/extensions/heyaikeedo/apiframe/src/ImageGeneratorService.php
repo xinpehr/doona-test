@@ -353,8 +353,14 @@ class ImageGeneratorService implements ImageServiceInterface
                 error_log("APIFrame: Height: " . $height);
                 
                 error_log("APIFrame: Generating BlurHash...");
-                $blurHash = BlurHashGenerator::generateBlurHash($img, $width, $height);
-                error_log("APIFrame: BlurHash generated: " . $blurHash);
+                try {
+                    $blurHash = BlurHashGenerator::generateBlurHash($img, $width, $height);
+                    error_log("APIFrame: BlurHash generated: " . $blurHash);
+                } catch (\Exception $e) {
+                    error_log("APIFrame: BlurHash generation failed: " . $e->getMessage());
+                    error_log("APIFrame: Using default BlurHash");
+                    $blurHash = 'L9Fj^kS6WA%L~pi^R*j[*7Z~oLxu'; // Default blur hash
+                }
                 
                 $file = new ImageFileEntity(
                     new Storage($this->cdn->getAdapterLookupKey()),
