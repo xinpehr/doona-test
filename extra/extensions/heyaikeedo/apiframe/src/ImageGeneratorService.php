@@ -342,24 +342,45 @@ class ImageGeneratorService implements ImageServiceInterface
             $cdnUrl = $this->cdn->getUrl($name);
             error_log("APIFrame: Image uploaded to CDN: " . $cdnUrl);
             
-            // Create ImageFileEntity
-            $file = new ImageFileEntity(
-                new Storage($this->cdn->getAdapterLookupKey()),
-                new ObjectKey($name),
-                new Url($cdnUrl),
-                new Size(strlen($imageData)),
-                new Width($width),
-                new Height($height),
-                BlurHashGenerator::generateBlurHash($img, $width, $height)
-            );
-            
-            // Cost will be calculated by the main system
-            
-            // Complete the entity
-            $entity->setOutputFile($file);
-            $entity->setState(State::COMPLETED);
-            
-            error_log("APIFrame: Task completed successfully!");
+            try {
+                // Create ImageFileEntity
+                error_log("APIFrame: Creating ImageFileEntity...");
+                error_log("APIFrame: Storage: " . $this->cdn->getAdapterLookupKey());
+                error_log("APIFrame: ObjectKey: " . $name);
+                error_log("APIFrame: URL: " . $cdnUrl);
+                error_log("APIFrame: Size: " . strlen($imageData));
+                error_log("APIFrame: Width: " . $width);
+                error_log("APIFrame: Height: " . $height);
+                
+                error_log("APIFrame: Generating BlurHash...");
+                $blurHash = BlurHashGenerator::generateBlurHash($img, $width, $height);
+                error_log("APIFrame: BlurHash generated: " . $blurHash);
+                
+                $file = new ImageFileEntity(
+                    new Storage($this->cdn->getAdapterLookupKey()),
+                    new ObjectKey($name),
+                    new Url($cdnUrl),
+                    new Size(strlen($imageData)),
+                    new Width($width),
+                    new Height($height),
+                    $blurHash
+                );
+                error_log("APIFrame: ImageFileEntity created successfully");
+                
+                // Cost will be calculated by the main system
+                
+                // Complete the entity
+                error_log("APIFrame: Setting output file and state...");
+                $entity->setOutputFile($file);
+                $entity->setState(State::COMPLETED);
+                error_log("APIFrame: Output file and state set successfully");
+                
+                error_log("APIFrame: Task completed successfully!");
+            } catch (\Exception $e) {
+                error_log("APIFrame: Error in ImageFileEntity creation: " . $e->getMessage());
+                error_log("APIFrame: Exception class: " . get_class($e));
+                throw $e;
+            }
             
             imagedestroy($img);
             
