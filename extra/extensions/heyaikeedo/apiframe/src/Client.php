@@ -21,7 +21,7 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 class Client
 {
-    private const BASE_URL = 'https://api.apiframe.ai';
+    private const BASE_URL = 'https://api.apiframe.pro';
     private const FETCH_URL = 'https://api.apiframe.pro/fetch';
 
     public function __construct(
@@ -124,9 +124,13 @@ class Client
         }
 
         error_log("APIFrame Client: Sending request body: " . json_encode($body));
+        error_log("APIFrame Client: Request URL: " . self::BASE_URL . '/imagine');
         
-        $resp = $this->sendRequest('POST', '/pro/imagine', $body);
+        $resp = $this->sendRequest('POST', '/imagine', $body);
         $content = $resp->getBody()->getContents();
+        
+        error_log("APIFrame Client: Response status: " . $resp->getStatusCode());
+        error_log("APIFrame Client: Response body: " . $content);
         
         return json_decode($content, true) ?? [];
     }
