@@ -115,6 +115,9 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_mode', $mode);
 
         } catch (\Exception $e) {
+            error_log("APIFrame Exception: " . $e->getMessage());
+            error_log("APIFrame Exception Type: " . get_class($e));
+            error_log("APIFrame Exception Trace: " . $e->getTraceAsString());
             throw new DomainException('Failed to generate image: ' . $e->getMessage());
         }
 
@@ -147,14 +150,19 @@ class ImageGeneratorService implements ImageServiceInterface
             return;
         }
 
+        error_log("APIFrame: parseDirectory called, tool enabled: " . ($this->isToolEnabled ? 'YES' : 'NO'));
+
         if (!$this->isToolEnabled) {
+            error_log("APIFrame: Tool not enabled, no models available");
             $this->models = [];
             return;
         }
 
         $services = array_filter($this->registry['directory'], fn($service) => $service['key'] === 'apiframe');
+        error_log("APIFrame: Found services: " . count($services));
 
         if (count($services) === 0) {
+            error_log("APIFrame: No APIFrame service found in registry");
             $this->models = [];
             return;
         }
