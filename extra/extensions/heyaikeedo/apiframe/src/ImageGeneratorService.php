@@ -137,7 +137,9 @@ class ImageGeneratorService implements ImageServiceInterface
         }
 
         error_log("APIFrame: Returning entity with ID: " . $entity->getId()->getValue());
-        error_log("APIFrame: Entity output URL: " . ($entity->getOutputImageUrl() ?: 'NULL'));
+        error_log("APIFrame: Entity state: " . $entity->getState()->value);
+        error_log("APIFrame: Entity cost: " . $entity->getCost()->value);
+        error_log("APIFrame: Entity output file: " . ($entity->getOutputFile() ? 'SET' : 'NULL'));
         
         return $entity;
     }
