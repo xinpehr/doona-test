@@ -9,6 +9,7 @@ use Easy\Router\Mapper\AttributeMapper;
 use Override;
 use Plugin\Domain\Context;
 use Plugin\Domain\PluginInterface;
+use Shared\Infrastructure\Services\ModelRegistry;
 use Twig\Loader\FilesystemLoader;
 
 /**
@@ -27,11 +28,13 @@ class Plugin implements PluginInterface
      * @param FilesystemLoader $loader TWIG loader for templates
      * @param AttributeMapper $mapper Route mapper for webhook endpoints
      * @param AiServiceFactory $factory AI service factory for registering services
+     * @param ModelRegistry $registry Model registry for registering models
      */
     public function __construct(
         private FilesystemLoader $loader,
         private AttributeMapper $mapper,
         private AiServiceFactory $factory,
+        private ModelRegistry $registry,
     ) {}
 
     #[Override]
@@ -48,5 +51,140 @@ class Plugin implements PluginInterface
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
+
+        // Register APIFrame models in the registry
+        $this->registerModels();
+    }
+
+    /**
+     * Register APIFrame Midjourney models in the model registry
+     */
+    private function registerModels(): void
+    {
+        // Define APIFrame service configuration
+        $apiFrameService = [
+            'key' => 'apiframe',
+            'name' => 'APIFrame',
+            'icon' => '/assets/icons/monochrome/apiframe.svg',
+            'models' => [
+                [
+                    'type' => 'image',
+                    'key' => 'apiframe/midjourney-v6.1',
+                    'name' => 'Midjourney v6.1',
+                    'description' => 'Professional Midjourney v6.1 image generation with enhanced prompt following',
+                    'provider' => [
+                        'name' => 'Midjourney',
+                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                    ],
+                    'rates' => [
+                        [
+                            'key' => 'apiframe-midjourney-v6.1',
+                            'type' => 'image',
+                            'unit' => 'image'
+                        ]
+                    ],
+                    'config' => [
+                        'mode' => 'fast',
+                        'max_prompt_length' => 4000,
+                        'supported_formats' => ['png', 'jpg', 'webp']
+                    ],
+                    'enabled' => true
+                ],
+                [
+                    'type' => 'image', 
+                    'key' => 'apiframe/midjourney-v7',
+                    'name' => 'Midjourney v7',
+                    'description' => 'Latest Midjourney v7 with improved image quality and style consistency',
+                    'provider' => [
+                        'name' => 'Midjourney',
+                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                    ],
+                    'rates' => [
+                        [
+                            'key' => 'apiframe-midjourney-v7',
+                            'type' => 'image',
+                            'unit' => 'image'
+                        ]
+                    ],
+                    'config' => [
+                        'mode' => 'fast',
+                        'max_prompt_length' => 4000,
+                        'supported_formats' => ['png', 'jpg', 'webp']
+                    ],
+                    'enabled' => true
+                ],
+                [
+                    'type' => 'image',
+                    'key' => 'apiframe/midjourney-v6.1-turbo',
+                    'name' => 'Midjourney v6.1 (Turbo)',
+                    'description' => 'Fast Midjourney v6.1 generation with turbo mode for quick results',
+                    'provider' => [
+                        'name' => 'Midjourney',
+                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                    ],
+                    'rates' => [
+                        [
+                            'key' => 'apiframe-midjourney-v6.1-turbo',
+                            'type' => 'image',
+                            'unit' => 'image'
+                        ]
+                    ],
+                    'config' => [
+                        'mode' => 'turbo',
+                        'max_prompt_length' => 4000,
+                        'supported_formats' => ['png', 'jpg', 'webp']
+                    ],
+                    'enabled' => true
+                ],
+                [
+                    'type' => 'image',
+                    'key' => 'apiframe/midjourney-v7-turbo',
+                    'name' => 'Midjourney v7 (Turbo)',
+                    'description' => 'Fast Midjourney v7 generation with turbo mode for quick results',
+                    'provider' => [
+                        'name' => 'Midjourney',
+                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                    ],
+                    'rates' => [
+                        [
+                            'key' => 'apiframe-midjourney-v7-turbo',
+                            'type' => 'image',
+                            'unit' => 'image'
+                        ]
+                    ],
+                    'config' => [
+                        'mode' => 'turbo',
+                        'max_prompt_length' => 4000,
+                        'supported_formats' => ['png', 'jpg', 'webp']
+                    ],
+                    'enabled' => true
+                ]
+            ]
+        ];
+
+        // Add the service to registry directory
+        if (!isset($this->registry['directory'])) {
+            $this->registry['directory'] = [];
+        }
+
+        // Check if APIFrame service already exists
+        $existingIndex = null;
+        foreach ($this->registry['directory'] as $index => $service) {
+            if ($service['key'] === 'apiframe') {
+                $existingIndex = $index;
+                break;
+            }
+        }
+
+        if ($existingIndex !== null) {
+            // Update existing service
+            $this->registry['directory'][$existingIndex] = $apiFrameService;
+        } else {
+            // Add new service
+            $this->registry['directory'][] = $apiFrameService;
+        }
+
+        // Save the updated registry
+        $this->registry->save();
     }
 }
