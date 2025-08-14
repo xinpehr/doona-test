@@ -106,11 +106,38 @@ class ImageGeneratorService implements ImageServiceInterface
             $mode = $params['mode'];
         }
 
+        // Extract aspect ratio if provided
+        $aspectRatio = null;
+        if (isset($params['aspect_ratio'])) {
+            $aspectRatio = $params['aspect_ratio'];
+        }
+
+        // Prepare prompt with style if provided
+        $prompt = $params['prompt'];
+        if (isset($params['style']) && !empty($params['style'])) {
+            $style = $params['style'];
+            switch ($style) {
+                case 'raw':
+                    $prompt .= ' --style raw';
+                    break;
+                case 'natural':
+                    $prompt .= ', natural style';
+                    break;
+                case 'artistic':
+                    $prompt .= ', artistic style';
+                    break;
+                case 'cinematic':
+                    $prompt .= ', cinematic style';
+                    break;
+            }
+        }
+
         try {
             // Send imagine request to APIFrame
             $response = $this->client->imagine(
-                $params['prompt'],
-                $mode
+                $prompt,
+                $mode,
+                $aspectRatio
             );
 
             if (!isset($response['task_id'])) {

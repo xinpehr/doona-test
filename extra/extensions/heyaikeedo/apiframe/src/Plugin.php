@@ -103,8 +103,82 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     ],
                     'config' => [
                         'mode' => 'fast',
-                        'max_prompt_length' => 4000,
-                        'supported_formats' => ['png', 'jpg', 'webp']
+                        'prompt_length' => 4000,
+                        'negative_prompt' => false,
+                        'supported_formats' => ['png', 'jpg', 'webp'],
+                        'images' => [
+                            'required' => false,
+                            'limit' => 1,
+                            'mime' => [
+                                'image/png',
+                                'image/jpeg',
+                                'image/webp'
+                            ]
+                        ],
+                        'params' => [
+                            [
+                                'key' => 'aspect_ratio',
+                                'label' => 'Aspect Ratio',
+                                'options' => [
+                                    [
+                                        'value' => '1:1',
+                                        'label' => '1:1 (Square)'
+                                    ],
+                                    [
+                                        'value' => '16:9',
+                                        'label' => '16:9 (Landscape)'
+                                    ],
+                                    [
+                                        'value' => '9:16',
+                                        'label' => '9:16 (Portrait)'
+                                    ],
+                                    [
+                                        'value' => '21:9',
+                                        'label' => '21:9 (Ultrawide)'
+                                    ],
+                                    [
+                                        'value' => '4:3',
+                                        'label' => '4:3 (Standard)'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'mode',
+                                'label' => 'Generation Mode',
+                                'options' => [
+                                    [
+                                        'value' => 'fast',
+                                        'label' => 'Fast Mode'
+                                    ],
+                                    [
+                                        'value' => 'turbo',
+                                        'label' => 'Turbo Mode'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'style',
+                                'label' => 'Style',
+                                'options' => [
+                                    [
+                                        'value' => 'raw',
+                                        'label' => 'Raw Style'
+                                    ],
+                                    [
+                                        'value' => 'natural',
+                                        'label' => 'Natural'
+                                    ],
+                                    [
+                                        'value' => 'artistic',
+                                        'label' => 'Artistic'
+                                    ],
+                                    [
+                                        'value' => 'cinematic',
+                                        'label' => 'Cinematic'
+                                    ]
+                                ]
+                            ]
+                        ]
                     ],
                     'enabled' => true
                 ],
@@ -127,8 +201,82 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     ],
                     'config' => [
                         'mode' => 'fast',
-                        'max_prompt_length' => 4000,
-                        'supported_formats' => ['png', 'jpg', 'webp']
+                        'prompt_length' => 4000,
+                        'negative_prompt' => false,
+                        'supported_formats' => ['png', 'jpg', 'webp'],
+                        'images' => [
+                            'required' => false,
+                            'limit' => 1,
+                            'mime' => [
+                                'image/png',
+                                'image/jpeg',
+                                'image/webp'
+                            ]
+                        ],
+                        'params' => [
+                            [
+                                'key' => 'aspect_ratio',
+                                'label' => 'Aspect Ratio',
+                                'options' => [
+                                    [
+                                        'value' => '1:1',
+                                        'label' => '1:1 (Square)'
+                                    ],
+                                    [
+                                        'value' => '16:9',
+                                        'label' => '16:9 (Landscape)'
+                                    ],
+                                    [
+                                        'value' => '9:16',
+                                        'label' => '9:16 (Portrait)'
+                                    ],
+                                    [
+                                        'value' => '21:9',
+                                        'label' => '21:9 (Ultrawide)'
+                                    ],
+                                    [
+                                        'value' => '4:3',
+                                        'label' => '4:3 (Standard)'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'mode',
+                                'label' => 'Generation Mode',
+                                'options' => [
+                                    [
+                                        'value' => 'fast',
+                                        'label' => 'Fast Mode'
+                                    ],
+                                    [
+                                        'value' => 'turbo',
+                                        'label' => 'Turbo Mode'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'style',
+                                'label' => 'Style',
+                                'options' => [
+                                    [
+                                        'value' => 'raw',
+                                        'label' => 'Raw Style'
+                                    ],
+                                    [
+                                        'value' => 'natural',
+                                        'label' => 'Natural'
+                                    ],
+                                    [
+                                        'value' => 'artistic',
+                                        'label' => 'Artistic'
+                                    ],
+                                    [
+                                        'value' => 'cinematic',
+                                        'label' => 'Cinematic'
+                                    ]
+                                ]
+                            ]
+                        ]
                     ],
                     'enabled' => true
                 ],
@@ -151,8 +299,73 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     ],
                     'config' => [
                         'mode' => 'turbo',
-                        'max_prompt_length' => 4000,
-                        'supported_formats' => ['png', 'jpg', 'webp']
+                        'prompt_length' => 4000,
+                        'negative_prompt' => false,
+                        'supported_formats' => ['png', 'jpg', 'webp'],
+                        'params' => [
+                            [
+                                'key' => 'aspect_ratio',
+                                'label' => 'Aspect Ratio',
+                                'options' => [
+                                    [
+                                        'value' => '1:1',
+                                        'label' => '1:1 (Square)'
+                                    ],
+                                    [
+                                        'value' => '16:9',
+                                        'label' => '16:9 (Landscape)'
+                                    ],
+                                    [
+                                        'value' => '9:16',
+                                        'label' => '9:16 (Portrait)'
+                                    ],
+                                    [
+                                        'value' => '21:9',
+                                        'label' => '21:9 (Ultrawide)'
+                                    ],
+                                    [
+                                        'value' => '4:3',
+                                        'label' => '4:3 (Standard)'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'mode',
+                                'label' => 'Generation Mode',
+                                'options' => [
+                                    [
+                                        'value' => 'fast',
+                                        'label' => 'Fast Mode'
+                                    ],
+                                    [
+                                        'value' => 'turbo',
+                                        'label' => 'Turbo Mode'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'style',
+                                'label' => 'Style',
+                                'options' => [
+                                    [
+                                        'value' => 'raw',
+                                        'label' => 'Raw Style'
+                                    ],
+                                    [
+                                        'value' => 'natural',
+                                        'label' => 'Natural'
+                                    ],
+                                    [
+                                        'value' => 'artistic',
+                                        'label' => 'Artistic'
+                                    ],
+                                    [
+                                        'value' => 'cinematic',
+                                        'label' => 'Cinematic'
+                                    ]
+                                ]
+                            ]
+                        ]
                     ],
                     'enabled' => true
                 ],
@@ -175,8 +388,73 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     ],
                     'config' => [
                         'mode' => 'turbo',
-                        'max_prompt_length' => 4000,
-                        'supported_formats' => ['png', 'jpg', 'webp']
+                        'prompt_length' => 4000,
+                        'negative_prompt' => false,
+                        'supported_formats' => ['png', 'jpg', 'webp'],
+                        'params' => [
+                            [
+                                'key' => 'aspect_ratio',
+                                'label' => 'Aspect Ratio',
+                                'options' => [
+                                    [
+                                        'value' => '1:1',
+                                        'label' => '1:1 (Square)'
+                                    ],
+                                    [
+                                        'value' => '16:9',
+                                        'label' => '16:9 (Landscape)'
+                                    ],
+                                    [
+                                        'value' => '9:16',
+                                        'label' => '9:16 (Portrait)'
+                                    ],
+                                    [
+                                        'value' => '21:9',
+                                        'label' => '21:9 (Ultrawide)'
+                                    ],
+                                    [
+                                        'value' => '4:3',
+                                        'label' => '4:3 (Standard)'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'mode',
+                                'label' => 'Generation Mode',
+                                'options' => [
+                                    [
+                                        'value' => 'fast',
+                                        'label' => 'Fast Mode'
+                                    ],
+                                    [
+                                        'value' => 'turbo',
+                                        'label' => 'Turbo Mode'
+                                    ]
+                                ]
+                            ],
+                            [
+                                'key' => 'style',
+                                'label' => 'Style',
+                                'options' => [
+                                    [
+                                        'value' => 'raw',
+                                        'label' => 'Raw Style'
+                                    ],
+                                    [
+                                        'value' => 'natural',
+                                        'label' => 'Natural'
+                                    ],
+                                    [
+                                        'value' => 'artistic',
+                                        'label' => 'Artistic'
+                                    ],
+                                    [
+                                        'value' => 'cinematic',
+                                        'label' => 'Cinematic'
+                                    ]
+                                ]
+                            ]
+                        ]
                     ],
                     'enabled' => true
                 ]

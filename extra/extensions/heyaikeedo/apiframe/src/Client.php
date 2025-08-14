@@ -103,18 +103,25 @@ class Client
      * Generate images using Midjourney imagine endpoint
      * 
      * @param string $prompt Text prompt for Midjourney AI
-     * @param string $mode Can be "fast" or "turbo"  
+     * @param string $mode Can be "fast" or "turbo"
+     * @param string|null $aspectRatio Optional aspect ratio (e.g. "16:9", "1:1", "9:16")
      * @return array Response with task_id
      * @throws ApiException
      */
     public function imagine(
         string $prompt,
-        string $mode = 'fast'
+        string $mode = 'fast',
+        ?string $aspectRatio = null
     ): array {
         $body = [
             'prompt' => $prompt,
             'mode' => $mode,
         ];
+
+        // Add aspect ratio if provided
+        if ($aspectRatio) {
+            $body['aspect_ratio'] = $aspectRatio;
+        }
 
         $resp = $this->sendRequest('POST', '/pro/imagine', $body);
         $content = $resp->getBody()->getContents();
