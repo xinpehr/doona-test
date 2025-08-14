@@ -53,12 +53,15 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
+
+        // Register APIFrame models in the registry immediately when plugin boots
+        $this->registerModels();
     }
 
     #[Override]
     public function activate(Context $context): void
     {
-        // Register APIFrame models when plugin is activated
+        // Register APIFrame models when plugin is activated (backup method)
         $this->registerModels();
     }
 
