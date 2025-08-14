@@ -109,9 +109,9 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_task_id', $response['task_id']);
             $entity->addMeta('apiframe_mode', $mode);
 
-            error_log("APIFrame: Starting polling for task: " . $response['task_id']);
-            // Start polling for result
-            $this->pollTaskResult($entity, $response['task_id']);
+            error_log("APIFrame: Starting immediate check for task: " . $response['task_id']);
+            // Check once immediately, don't block the request
+            $this->checkTaskOnce($entity, $response['task_id']);
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
@@ -171,7 +171,47 @@ class ImageGeneratorService implements ImageServiceInterface
     }
 
     /**
-     * Poll task result using APIFrame fetch endpoint
+     * Check task once immediately (non-blocking)
+     */
+    private function checkTaskOnce(ImageEntity $entity, string $taskId): void
+    {
+        try {
+            error_log("APIFrame: Checking task once: " . $taskId);
+            
+            $result = $this->client->fetch($taskId);
+            error_log("APIFrame: Immediate check result: " . json_encode($result));
+            
+            if (isset($result['status'])) {
+                switch ($result['status']) {
+                    case 'completed':
+                    case 'finished':
+                        // Handle completed task
+                        if (isset($result['image_url'])) {
+                            error_log("APIFrame: Single image URL found immediately");
+                            $this->handleImageResult($entity, $result['image_url']);
+                        } elseif (isset($result['image_urls']) && is_array($result['image_urls']) && !empty($result['image_urls'])) {
+                            $imageUrl = $result['image_urls'][0];
+                            error_log("APIFrame: Multiple images found immediately, using first: " . $imageUrl);
+                            $this->handleImageResult($entity, $imageUrl);
+                        }
+                        break;
+                        
+                    default:
+                        // Task not ready yet, just log and return
+                        error_log("APIFrame: Task not ready yet, status: " . $result['status']);
+                        $entity->addMeta('apiframe_status', $result['status']);
+                        break;
+                }
+            }
+            
+        } catch (\Exception $e) {
+            error_log("APIFrame: Error in immediate check: " . $e->getMessage());
+            // Don't throw, just log
+        }
+    }
+
+    /**
+     * Poll task result using APIFrame fetch endpoint (for background processing)
      */
     private function pollTaskResult(ImageEntity $entity, string $taskId): void
     {
@@ -261,14 +301,31 @@ class ImageGeneratorService implements ImageServiceInterface
             error_log("APIFrame: Generated filename: " . $filename);
             
             // Store in CDN
-            $url = $this->cdn->upload($imageData, $filename);
-            
-            error_log("APIFrame: Image uploaded to CDN, URL: " . $url);
+            try {
+                $url = $this->cdn->upload($imageData, $filename);
+                error_log("APIFrame: Image uploaded to CDN, URL: " . $url);
+            } catch (\Exception $e) {
+                error_log("APIFrame: CDN upload failed: " . $e->getMessage());
+                throw new DomainException('Failed to upload image to CDN: ' . $e->getMessage());
+            }
             
             // Update entity
-            $entity->setOutputImageUrl($url);
-            $entity->addMeta('apiframe_completed', true);
-            $entity->addMeta('apiframe_original_url', $imageUrl);
+            try {
+                $entity->setOutputImageUrl($url);
+                error_log("APIFrame: setOutputImageUrl called successfully");
+            } catch (\Exception $e) {
+                error_log("APIFrame: setOutputImageUrl failed: " . $e->getMessage());
+                throw new DomainException('Failed to set output image URL: ' . $e->getMessage());
+            }
+            
+            try {
+                $entity->addMeta('apiframe_completed', true);
+                $entity->addMeta('apiframe_original_url', $imageUrl);
+                error_log("APIFrame: Meta data added successfully");
+            } catch (\Exception $e) {
+                error_log("APIFrame: Adding meta failed: " . $e->getMessage());
+                throw new DomainException('Failed to add metadata: ' . $e->getMessage());
+            }
             
             error_log("APIFrame: Image processing completed successfully");
             
