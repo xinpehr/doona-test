@@ -128,6 +128,7 @@ class ImageGeneratorService implements ImageServiceInterface
         error_log("APIFrame: Entity state: " . $entity->getState()->value);
         error_log("APIFrame: Entity cost: " . $entity->getCost()->value);
         error_log("APIFrame: Entity output file: " . ($entity->getOutputFile() ? 'SET' : 'NULL'));
+        error_log("APIFrame: Entity title: " . ($entity->getTitle()->value ?? 'NULL'));
         
         return $entity;
     }
@@ -231,13 +232,15 @@ class ImageGeneratorService implements ImageServiceInterface
                     case 'processing':
                     case 'pending':
                     case 'queued':
+                    case 'staged':
+                    case 'submitted':
                         $progress = $result['percentage'] ?? 'unknown';
                         error_log("APIFrame: Task still processing... Progress: " . $progress);
-                        continue; // Continue polling
+                        continue 2; // Continue polling loop
                         
                     default:
                         error_log("APIFrame: Unknown status: " . $status . ", continuing...");
-                        continue;
+                        continue 2; // Continue polling loop
                 }
                 
             } catch (\Exception $e) {

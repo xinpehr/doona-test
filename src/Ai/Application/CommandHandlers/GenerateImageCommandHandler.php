@@ -62,51 +62,84 @@ class GenerateImageCommandHandler
             $cmd->model
         );
 
-        $entity = $service->generateImage(
-            $ws,
-            $user,
-            $cmd->model,
-            $cmd->params
-        );
+        try {
+            error_log("GenerateImageCommandHandler: Calling service->generateImage");
+            $entity = $service->generateImage(
+                $ws,
+                $user,
+                $cmd->model,
+                $cmd->params
+            );
+            error_log("GenerateImageCommandHandler: Entity received - State: " . $entity->getState()->value . ", Title: " . ($entity->getTitle()->value ?? 'NULL'));
+        } catch (\Exception $e) {
+            error_log("GenerateImageCommandHandler: Exception in generateImage: " . $e->getMessage());
+            throw $e;
+        }
 
         if (
             is_null($entity->getTitle()->value)
             && isset($cmd->params['prompt'])
         ) {
-            $service = $this->factory->create(
-                TitleServiceInterface::class,
-                $ws->getSubscription()
-                    ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
-                    : new Model('gpt-3.5-turbo')
-            );
+            error_log("GenerateImageCommandHandler: Entity has no title, generating...");
+            try {
+                $service = $this->factory->create(
+                    TitleServiceInterface::class,
+                    $ws->getSubscription()
+                        ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
+                        : new Model('gpt-3.5-turbo')
+                );
 
-            $content = new Content($cmd->params['prompt']);
-            $titleResp = $service->generateTitle(
-                $content,
-                $ws->getSubscription()
-                    ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
-                    : new Model('gpt-3.5-turbo')
-            );
+                $content = new Content($cmd->params['prompt']);
+                $titleResp = $service->generateTitle(
+                    $content,
+                    $ws->getSubscription()
+                        ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
+                        : new Model('gpt-3.5-turbo')
+                );
 
-            $entity->setTitle($titleResp->title);
-            $entity->addCost($titleResp->cost);
+                $entity->setTitle($titleResp->title);
+                $entity->addCost($titleResp->cost);
+                error_log("GenerateImageCommandHandler: Title generated: " . $titleResp->title->value);
+            } catch (\Exception $e) {
+                error_log("GenerateImageCommandHandler: Title generation failed: " . $e->getMessage());
+                // Don't throw, continue without title
+            }
+        } else {
+            error_log("GenerateImageCommandHandler: Entity already has title: " . ($entity->getTitle()->value ?? 'NULL'));
         }
 
+        error_log("GenerateImageCommandHandler: Adding entity to repository");
         $this->repo->add($entity);
         
         // Flush immediately to persist entity to database
         // This ensures the entity appears in library even during async processing
-        $this->repo->flush();
-
-        if ($entity->getCost()->value > 0) {
-            // Deduct credit from workspace
-            $ws->deductCredit($entity->getCost());
-
-            // Dispatch event
-            $event = new CreditUsageEvent($ws, $entity->getCost());
-            $this->dispatcher->dispatch($event);
+        try {
+            $this->repo->flush();
+            error_log("GenerateImageCommandHandler: Repository flushed successfully");
+        } catch (\Exception $e) {
+            error_log("GenerateImageCommandHandler: Flush failed: " . $e->getMessage());
+            throw $e;
         }
 
+        if ($entity->getCost()->value > 0) {
+            error_log("GenerateImageCommandHandler: Processing credit deduction, cost: " . $entity->getCost()->value);
+            try {
+                // Deduct credit from workspace
+                $ws->deductCredit($entity->getCost());
+
+                // Dispatch event
+                $event = new CreditUsageEvent($ws, $entity->getCost());
+                $this->dispatcher->dispatch($event);
+                error_log("GenerateImageCommandHandler: Credit deduction completed");
+            } catch (\Exception $e) {
+                error_log("GenerateImageCommandHandler: Credit deduction failed: " . $e->getMessage());
+                throw $e;
+            }
+        } else {
+            error_log("GenerateImageCommandHandler: No cost to deduct");
+        }
+
+        error_log("GenerateImageCommandHandler: Returning entity successfully");
         return $entity;
     }
 }
