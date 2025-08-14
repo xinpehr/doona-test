@@ -10,6 +10,7 @@ use Ai\Domain\Image\ImageServiceInterface;
 use Ai\Domain\ValueObjects\Model;
 use Ai\Domain\ValueObjects\RequestParams;
 use Ai\Domain\ValueObjects\State;
+use Ai\Domain\ValueObjects\Title;
 use Ai\Infrastructure\Services\CostCalculator;
 use Easy\Container\Attributes\Inject;
 use File\Domain\Entities\ImageFileEntity;
@@ -83,6 +84,13 @@ class ImageGeneratorService implements ImageServiceInterface
             $model,
             RequestParams::fromArray($params)
         );
+        
+        // Set a basic title from prompt to avoid title generation issues
+        if (isset($params['prompt'])) {
+            $title = mb_substr($params['prompt'], 0, 100); // Limit to 100 characters
+            $entity->setTitle(new Title($title));
+            error_log("APIFrame: Set title: " . $title);
+        }
         
         // Note: Don't set output file yet - will be set when image is ready (like FalAI)
         // Set initial state as PROCESSING so it appears in archive

@@ -85,23 +85,31 @@ class GenerateImageCommandHandler
             is_null($entity->getTitle()->value)
             && isset($cmd->params['prompt'])
         ) {
-            $service = $this->factory->create(
-                TitleServiceInterface::class,
-                $ws->getSubscription()
-                    ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
-                    : new Model('gpt-3.5-turbo')
-            );
+            error_log("GenerateImageCommandHandler: Generating title for entity");
+            try {
+                $service = $this->factory->create(
+                    TitleServiceInterface::class,
+                    $ws->getSubscription()
+                        ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
+                        : new Model('gpt-3.5-turbo')
+                );
 
-            $content = new Content($cmd->params['prompt']);
-            $titleResp = $service->generateTitle(
-                $content,
-                $ws->getSubscription()
-                    ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
-                    : new Model('gpt-3.5-turbo')
-            );
+                $content = new Content($cmd->params['prompt']);
+                $titleResp = $service->generateTitle(
+                    $content,
+                    $ws->getSubscription()
+                        ? $ws->getSubscription()->getPlan()->getConfig()->titler->model
+                        : new Model('gpt-3.5-turbo')
+                );
 
-            $entity->setTitle($titleResp->title);
-            $entity->addCost($titleResp->cost);
+                $entity->setTitle($titleResp->title);
+                $entity->addCost($titleResp->cost);
+                error_log("GenerateImageCommandHandler: Title generated successfully");
+            } catch (\Exception $e) {
+                error_log("GenerateImageCommandHandler: Exception during title generation: " . $e->getMessage());
+                error_log("GenerateImageCommandHandler: Skipping title generation and continuing");
+                // Don't throw, just skip title generation
+            }
         }
 
         error_log("GenerateImageCommandHandler: Adding entity to repository");
