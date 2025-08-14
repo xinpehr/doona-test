@@ -133,10 +133,7 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_mode', $mode);
             $entity->addMeta('apiframe_status', 'pending');
 
-            error_log("APIFrame: Task submitted successfully. Starting simple polling...");
-            
-            // Start simple polling loop (blocking but with timeout)
-            $this->pollTask($entity, $response['task_id']);
+            error_log("APIFrame: Task submitted successfully. Entity returned immediately.");
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
@@ -232,6 +229,8 @@ class ImageGeneratorService implements ImageServiceInterface
             return $carry;
         }, []);
     }
+
+
 
     /**
      * Simple polling method - exactly as per APIFrame docs
