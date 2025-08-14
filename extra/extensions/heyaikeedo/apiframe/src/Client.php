@@ -104,29 +104,17 @@ class Client
      * 
      * @param string $prompt Text prompt for Midjourney AI
      * @param string $mode Can be "fast" or "turbo"  
-     * @param string $webhookUrl Task updates will be posted at this URL
-     * @param string|null $webhookSecret Will be passed as x-webhook-secret in headers
      * @return array Response with task_id
      * @throws ApiException
      */
     public function imagine(
         string $prompt,
-        string $mode = 'fast',
-        string $webhookUrl = '',
-        ?string $webhookSecret = null
+        string $mode = 'fast'
     ): array {
         $body = [
             'prompt' => $prompt,
             'mode' => $mode,
         ];
-
-        if ($webhookUrl) {
-            $body['webhook_url'] = $webhookUrl;
-        }
-
-        if ($webhookSecret) {
-            $body['webhook_secret'] = $webhookSecret;
-        }
 
         $resp = $this->sendRequest('POST', '/pro/imagine', $body);
         $content = $resp->getBody()->getContents();

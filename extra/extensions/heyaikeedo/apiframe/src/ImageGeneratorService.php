@@ -51,16 +51,11 @@ class ImageGeneratorService implements ImageServiceInterface
         Model $model,
         ?array $params = null
     ): ImageEntity {
-        error_log("APIFrame: generateImage called with model: " . $model->value);
-        error_log("APIFrame: Available models: " . json_encode(array_keys($this->models ?? [])));
-        
         if (!$params || !array_key_exists('prompt', $params)) {
-            error_log("APIFrame Error: Missing prompt parameter");
             throw new DomainException('Missing parameter: prompt');
         }
 
         if (!$this->supportsModel($model)) {
-            error_log("APIFrame Error: Model not supported: " . $model->value);
             throw new DomainException('Model not supported: ' . $model->value);
         }
 
@@ -84,26 +79,12 @@ class ImageGeneratorService implements ImageServiceInterface
             $mode = $params['mode'];
         }
 
-        // Generate webhook URL and secret
-        $webhookUrl = $this->helper->getCallBackUrl($entity);
-        $webhookSecret = $this->helper->generateWebhookSecret($entity);
-
         try {
-            error_log("APIFrame: API Key available: " . ($this->apiKey ? 'YES' : 'NO'));
-            error_log("APIFrame: Tool enabled: " . ($this->isToolEnabled ? 'YES' : 'NO'));
-            error_log("APIFrame: Prompt: " . $params['prompt']);
-            error_log("APIFrame: Mode: " . $mode);
-            error_log("APIFrame: Webhook URL: " . $webhookUrl);
-            
             // Send imagine request to APIFrame
             $response = $this->client->imagine(
                 $params['prompt'],
-                $mode,
-                $webhookUrl,
-                $webhookSecret
+                $mode
             );
-            
-            error_log("APIFrame: Response received: " . json_encode($response));
 
             if (!isset($response['task_id'])) {
                 throw new DomainException('Invalid response from APIFrame API');
@@ -111,13 +92,12 @@ class ImageGeneratorService implements ImageServiceInterface
 
             // Store task information in entity metadata
             $entity->addMeta('apiframe_task_id', $response['task_id']);
-            $entity->addMeta('apiframe_webhook_secret', $webhookSecret);
             $entity->addMeta('apiframe_mode', $mode);
 
+            // Start polling for result
+            $this->pollTaskResult($entity, $response['task_id']);
+
         } catch (\Exception $e) {
-            error_log("APIFrame Exception: " . $e->getMessage());
-            error_log("APIFrame Exception Type: " . get_class($e));
-            error_log("APIFrame Exception Trace: " . $e->getTraceAsString());
             throw new DomainException('Failed to generate image: ' . $e->getMessage());
         }
 
@@ -150,19 +130,14 @@ class ImageGeneratorService implements ImageServiceInterface
             return;
         }
 
-        error_log("APIFrame: parseDirectory called, tool enabled: " . ($this->isToolEnabled ? 'YES' : 'NO'));
-
         if (!$this->isToolEnabled) {
-            error_log("APIFrame: Tool not enabled, no models available");
             $this->models = [];
             return;
         }
 
         $services = array_filter($this->registry['directory'], fn($service) => $service['key'] === 'apiframe');
-        error_log("APIFrame: Found services: " . count($services));
 
         if (count($services) === 0) {
-            error_log("APIFrame: No APIFrame service found in registry");
             $this->models = [];
             return;
         }
@@ -174,5 +149,81 @@ class ImageGeneratorService implements ImageServiceInterface
             $carry[$model['key']] = $model;
             return $carry;
         }, []);
+    }
+
+    /**
+     * Poll task result using APIFrame fetch endpoint
+     */
+    private function pollTaskResult(ImageEntity $entity, string $taskId): void
+    {
+        $maxAttempts = 60; // Max 5 minutes (60 * 5 seconds)
+        $attempt = 0;
+        
+        while ($attempt < $maxAttempts) {
+            try {
+                sleep(5); // Wait 5 seconds between polls
+                $attempt++;
+                
+                $result = $this->client->fetch($taskId);
+                
+                if (isset($result['status'])) {
+                    switch ($result['status']) {
+                        case 'completed':
+                            if (isset($result['image_url'])) {
+                                $this->handleImageResult($entity, $result['image_url']);
+                                return;
+                            }
+                            break;
+                            
+                        case 'failed':
+                        case 'error':
+                            $error = $result['error'] ?? 'Image generation failed';
+                            $entity->addMeta('apiframe_error', $error);
+                            return;
+                            
+                        case 'pending':
+                        case 'processing':
+                            // Continue polling
+                            continue 2;
+                    }
+                }
+                
+            } catch (\Exception $e) {
+                // Continue polling on error
+                continue;
+            }
+        }
+        
+        // Timeout reached
+        $entity->addMeta('apiframe_error', 'Task timeout after 5 minutes');
+    }
+    
+    /**
+     * Handle successful image result
+     */
+    private function handleImageResult(ImageEntity $entity, string $imageUrl): void
+    {
+        try {
+            // Download and store the image
+            $imageData = file_get_contents($imageUrl);
+            if ($imageData === false) {
+                throw new DomainException('Failed to download image from APIFrame');
+            }
+            
+            // Generate filename
+            $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
+            $filename = 'apiframe_' . $entity->getId()->getValue() . '.' . $extension;
+            
+            // Store in CDN
+            $url = $this->cdn->upload($imageData, $filename);
+            
+            // Update entity
+            $entity->setOutputImageUrl($url);
+            $entity->addMeta('apiframe_completed', true);
+            $entity->addMeta('apiframe_original_url', $imageUrl);
+            
+        } catch (\Exception $e) {
+            $entity->addMeta('apiframe_error', 'Failed to process image: ' . $e->getMessage());
+        }
     }
 }

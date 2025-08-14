@@ -18,26 +18,10 @@ class Helper
     ) {}
 
     /**
-     * Generate callback URL for webhooks
+     * Generate unique task reference for tracking
      */
-    public function getCallBackUrl(ImageEntity $image): string
+    public function generateTaskReference(ImageEntity $image): string
     {
-        $protocol = $this->isSecure ? 'https' : 'http';
-        $domain = $this->domain;
-
-        return sprintf(
-            '%s://%s/webhooks/apiframe/%s',
-            $protocol,
-            $domain,
-            $image->getId()->getValue(),
-        );
-    }
-
-    /**
-     * Generate webhook secret for authentication
-     */
-    public function generateWebhookSecret(ImageEntity $image): string
-    {
-        return hash('sha256', 'apiframe_' . $image->getId()->getValue() . '_secret');
+        return 'apiframe_' . $image->getId()->getValue() . '_' . time();
     }
 }
