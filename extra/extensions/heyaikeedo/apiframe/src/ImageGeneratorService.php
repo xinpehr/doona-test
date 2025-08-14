@@ -371,7 +371,7 @@ class ImageGeneratorService implements ImageServiceInterface
                     new Size(strlen($imageData)),
                     new Width($width),
                     new Height($height),
-                    $blurHash
+                    new BlurHash($blurHash)
                 );
                 error_log("APIFrame: ImageFileEntity created successfully");
                 
