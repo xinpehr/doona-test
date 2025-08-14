@@ -88,7 +88,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     'type' => 'image',
                     'key' => 'apiframe/midjourney-v6.1',
                     'name' => 'Midjourney v6.1',
-                    'description' => 'Professional Midjourney v6.1 image generation with enhanced prompt following',
+                    'description' => 'Professional Midjourney v6.1 image generation with enhanced prompt following. Supports fast and turbo modes.',
                     'custom' => true,
                     'provider' => [
                         'name' => 'APIFrame',
@@ -186,7 +186,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     'type' => 'image', 
                     'key' => 'apiframe/midjourney-v7',
                     'name' => 'Midjourney v7',
-                    'description' => 'Latest Midjourney v7 with improved image quality and style consistency',
+                    'description' => 'Latest Midjourney v7 with improved image quality and style consistency. Supports fast and turbo modes.',
                     'custom' => true,
                     'provider' => [
                         'name' => 'APIFrame',
@@ -213,184 +213,6 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                                 'image/webp'
                             ]
                         ],
-                        'params' => [
-                            [
-                                'key' => 'aspect_ratio',
-                                'label' => 'Aspect Ratio',
-                                'options' => [
-                                    [
-                                        'value' => '1:1',
-                                        'label' => '1:1 (Square)'
-                                    ],
-                                    [
-                                        'value' => '16:9',
-                                        'label' => '16:9 (Landscape)'
-                                    ],
-                                    [
-                                        'value' => '9:16',
-                                        'label' => '9:16 (Portrait)'
-                                    ],
-                                    [
-                                        'value' => '21:9',
-                                        'label' => '21:9 (Ultrawide)'
-                                    ],
-                                    [
-                                        'value' => '4:3',
-                                        'label' => '4:3 (Standard)'
-                                    ]
-                                ]
-                            ],
-                            [
-                                'key' => 'mode',
-                                'label' => 'Generation Mode',
-                                'options' => [
-                                    [
-                                        'value' => 'fast',
-                                        'label' => 'Fast Mode'
-                                    ],
-                                    [
-                                        'value' => 'turbo',
-                                        'label' => 'Turbo Mode'
-                                    ]
-                                ]
-                            ],
-                            [
-                                'key' => 'style',
-                                'label' => 'Style',
-                                'options' => [
-                                    [
-                                        'value' => 'raw',
-                                        'label' => 'Raw Style'
-                                    ],
-                                    [
-                                        'value' => 'natural',
-                                        'label' => 'Natural'
-                                    ],
-                                    [
-                                        'value' => 'artistic',
-                                        'label' => 'Artistic'
-                                    ],
-                                    [
-                                        'value' => 'cinematic',
-                                        'label' => 'Cinematic'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    'enabled' => true
-                ],
-                [
-                    'type' => 'image',
-                    'key' => 'apiframe/midjourney-v6.1-turbo',
-                    'name' => 'Midjourney v6.1 (Turbo)',
-                    'description' => 'Fast Midjourney v6.1 generation with turbo mode for quick results',
-                    'custom' => true,
-                    'provider' => [
-                        'name' => 'APIFrame',
-                        'icon' => '/assets/icons/monochrome/apiframe.svg'
-                    ],
-                    'rates' => [
-                        [
-                            'key' => 'apiframe-midjourney-v6.1-turbo',
-                            'type' => 'image',
-                            'unit' => 'image'
-                        ]
-                    ],
-                    'config' => [
-                        'mode' => 'turbo',
-                        'prompt_length' => 4000,
-                        'negative_prompt' => false,
-                        'supported_formats' => ['png', 'jpg', 'webp'],
-                        'params' => [
-                            [
-                                'key' => 'aspect_ratio',
-                                'label' => 'Aspect Ratio',
-                                'options' => [
-                                    [
-                                        'value' => '1:1',
-                                        'label' => '1:1 (Square)'
-                                    ],
-                                    [
-                                        'value' => '16:9',
-                                        'label' => '16:9 (Landscape)'
-                                    ],
-                                    [
-                                        'value' => '9:16',
-                                        'label' => '9:16 (Portrait)'
-                                    ],
-                                    [
-                                        'value' => '21:9',
-                                        'label' => '21:9 (Ultrawide)'
-                                    ],
-                                    [
-                                        'value' => '4:3',
-                                        'label' => '4:3 (Standard)'
-                                    ]
-                                ]
-                            ],
-                            [
-                                'key' => 'mode',
-                                'label' => 'Generation Mode',
-                                'options' => [
-                                    [
-                                        'value' => 'fast',
-                                        'label' => 'Fast Mode'
-                                    ],
-                                    [
-                                        'value' => 'turbo',
-                                        'label' => 'Turbo Mode'
-                                    ]
-                                ]
-                            ],
-                            [
-                                'key' => 'style',
-                                'label' => 'Style',
-                                'options' => [
-                                    [
-                                        'value' => 'raw',
-                                        'label' => 'Raw Style'
-                                    ],
-                                    [
-                                        'value' => 'natural',
-                                        'label' => 'Natural'
-                                    ],
-                                    [
-                                        'value' => 'artistic',
-                                        'label' => 'Artistic'
-                                    ],
-                                    [
-                                        'value' => 'cinematic',
-                                        'label' => 'Cinematic'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    'enabled' => true
-                ],
-                [
-                    'type' => 'image',
-                    'key' => 'apiframe/midjourney-v7-turbo',
-                    'name' => 'Midjourney v7 (Turbo)',
-                    'description' => 'Fast Midjourney v7 generation with turbo mode for quick results',
-                    'custom' => true,
-                    'provider' => [
-                        'name' => 'APIFrame',
-                        'icon' => '/assets/icons/monochrome/apiframe.svg'
-                    ],
-                    'rates' => [
-                        [
-                            'key' => 'apiframe-midjourney-v7-turbo',
-                            'type' => 'image',
-                            'unit' => 'image'
-                        ]
-                    ],
-                    'config' => [
-                        'mode' => 'turbo',
-                        'prompt_length' => 4000,
-                        'negative_prompt' => false,
-                        'supported_formats' => ['png', 'jpg', 'webp'],
                         'params' => [
                             [
                                 'key' => 'aspect_ratio',
