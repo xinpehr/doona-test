@@ -8,6 +8,8 @@ use Ai\Infrastructure\Services\AiServiceFactory;
 use Easy\Router\Mapper\AttributeMapper;
 use Override;
 use Plugin\Domain\Context;
+use Plugin\Domain\Hooks\ActivateHookInterface;
+use Plugin\Domain\Hooks\DeactivateHookInterface;
 use Plugin\Domain\PluginInterface;
 use Shared\Infrastructure\Services\ModelRegistry;
 use Twig\Loader\FilesystemLoader;
@@ -20,7 +22,7 @@ use Twig\Loader\FilesystemLoader;
  * 
  * @see https://docs.apiframe.ai/pro-midjourney-api/api-endpoints/imagine.md
  */
-class Plugin implements PluginInterface
+class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookInterface
 {
     /**
      * Plugin constructor. Inject required dependencies for the plugin.
@@ -51,9 +53,20 @@ class Plugin implements PluginInterface
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
+    }
 
-        // Register APIFrame models in the registry
+    #[Override]
+    public function activate(Context $context): void
+    {
+        // Register APIFrame models when plugin is activated
         $this->registerModels();
+    }
+
+    #[Override]
+    public function deactivate(Context $context): void
+    {
+        // Remove APIFrame models when plugin is deactivated
+        $this->removeModels();
     }
 
     /**
@@ -183,6 +196,29 @@ class Plugin implements PluginInterface
             // Add new service
             $this->registry['directory'][] = $apiFrameService;
         }
+
+        // Save the updated registry
+        $this->registry->save();
+    }
+
+    /**
+     * Remove APIFrame models from the model registry
+     */
+    private function removeModels(): void
+    {
+        if (!isset($this->registry['directory'])) {
+            return;
+        }
+
+        // Find and remove APIFrame service
+        $updatedDirectory = [];
+        foreach ($this->registry['directory'] as $service) {
+            if ($service['key'] !== 'apiframe') {
+                $updatedDirectory[] = $service;
+            }
+        }
+
+        $this->registry['directory'] = $updatedDirectory;
 
         // Save the updated registry
         $this->registry->save();
