@@ -79,15 +79,17 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
             'key' => 'apiframe',
             'name' => 'APIFrame',
             'icon' => '/assets/icons/monochrome/apiframe.svg',
+            'custom' => true,
             'models' => [
                 [
                     'type' => 'image',
                     'key' => 'apiframe/midjourney-v6.1',
                     'name' => 'Midjourney v6.1',
                     'description' => 'Professional Midjourney v6.1 image generation with enhanced prompt following',
+                    'custom' => true,
                     'provider' => [
-                        'name' => 'Midjourney',
-                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                        'name' => 'APIFrame',
+                        'icon' => '/assets/icons/monochrome/apiframe.svg'
                     ],
                     'rates' => [
                         [
@@ -108,9 +110,10 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     'key' => 'apiframe/midjourney-v7',
                     'name' => 'Midjourney v7',
                     'description' => 'Latest Midjourney v7 with improved image quality and style consistency',
+                    'custom' => true,
                     'provider' => [
-                        'name' => 'Midjourney',
-                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                        'name' => 'APIFrame',
+                        'icon' => '/assets/icons/monochrome/apiframe.svg'
                     ],
                     'rates' => [
                         [
@@ -131,9 +134,10 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     'key' => 'apiframe/midjourney-v6.1-turbo',
                     'name' => 'Midjourney v6.1 (Turbo)',
                     'description' => 'Fast Midjourney v6.1 generation with turbo mode for quick results',
+                    'custom' => true,
                     'provider' => [
-                        'name' => 'Midjourney',
-                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                        'name' => 'APIFrame',
+                        'icon' => '/assets/icons/monochrome/apiframe.svg'
                     ],
                     'rates' => [
                         [
@@ -154,9 +158,10 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
                     'key' => 'apiframe/midjourney-v7-turbo',
                     'name' => 'Midjourney v7 (Turbo)',
                     'description' => 'Fast Midjourney v7 generation with turbo mode for quick results',
+                    'custom' => true,
                     'provider' => [
-                        'name' => 'Midjourney',
-                        'icon' => '/assets/icons/monochrome/midjourney.svg'
+                        'name' => 'APIFrame',
+                        'icon' => '/assets/icons/monochrome/apiframe.svg'
                     ],
                     'rates' => [
                         [
