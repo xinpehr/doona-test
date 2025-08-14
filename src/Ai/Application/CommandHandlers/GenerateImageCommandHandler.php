@@ -93,6 +93,7 @@ class GenerateImageCommandHandler
         }
 
         $this->repo->add($entity);
+        $this->repo->flush();
 
         if ($entity->getCost()->value > 0) {
             // Deduct credit from workspace
