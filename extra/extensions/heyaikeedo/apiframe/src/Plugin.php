@@ -42,10 +42,6 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
     #[Override]
     public function boot(Context $context): void
     {
-        // DEBUG: Plugin is booting
-        error_log("APIFrame Plugin: Boot method called");
-        error_log("APIFrame Plugin: Registry available: " . ($this->registry ? 'YES' : 'NO'));
-
         // Add template path to the TWIG loader to scan for view templates 
         // in current directory. The first argument is the path to the directory,
         // the second argument is the namespace to use in the template.
@@ -59,14 +55,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         $this->factory->register(ImageGeneratorService::class);
 
         // Register APIFrame models in the registry immediately when plugin boots
-        try {
-            error_log("APIFrame Plugin: Attempting to register models");
-            $this->registerModels();
-            error_log("APIFrame Plugin: Models registered successfully");
-        } catch (\Exception $e) {
-            error_log("APIFrame Plugin Error: " . $e->getMessage());
-            error_log("APIFrame Plugin Stack Trace: " . $e->getTraceAsString());
-        }
+        $this->registerModels();
     }
 
     #[Override]
@@ -194,14 +183,12 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
             ]
         ];
 
-        // Add the service to registry directory
-        if (!isset($this->registry['directory'])) {
-            $this->registry['directory'] = [];
-        }
+        // Get current directory array to avoid indirect modification
+        $directory = $this->registry['directory'] ?? [];
 
         // Check if APIFrame service already exists
         $existingIndex = null;
-        foreach ($this->registry['directory'] as $index => $service) {
+        foreach ($directory as $index => $service) {
             if ($service['key'] === 'apiframe') {
                 $existingIndex = $index;
                 break;
@@ -210,11 +197,14 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
 
         if ($existingIndex !== null) {
             // Update existing service
-            $this->registry['directory'][$existingIndex] = $apiFrameService;
+            $directory[$existingIndex] = $apiFrameService;
         } else {
             // Add new service
-            $this->registry['directory'][] = $apiFrameService;
+            $directory[] = $apiFrameService;
         }
+
+        // Set the updated directory back to registry
+        $this->registry['directory'] = $directory;
 
         // Save the updated registry
         $this->registry->save();
