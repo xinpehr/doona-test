@@ -166,3 +166,11 @@ git push origin main --force
 ls
 #1755167932
 git status
+#1755168166
+git add .
+#1755168171
+git commit -m "changes"
+#1755168176
+git push origin main
+#1755168265
+git status
