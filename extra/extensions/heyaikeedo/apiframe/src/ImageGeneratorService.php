@@ -88,6 +88,28 @@ class ImageGeneratorService implements ImageServiceInterface
             $cost
         );
         
+        // Create a placeholder file until real image is ready
+        $placeholderData = $this->createPlaceholderImage($params['prompt']);
+        $placeholderName = $this->cdn->generatePath('png', $workspace, $user);
+        $this->cdn->write($placeholderName, $placeholderData);
+        
+        $img = imagecreatefromstring($placeholderData);
+        $width = imagesx($img);
+        $height = imagesy($img);
+        
+        $placeholderFile = new ImageFileEntity(
+            new Storage($this->cdn->getAdapterLookupKey()),
+            new ObjectKey($placeholderName),
+            new Url($this->cdn->getUrl($placeholderName)),
+            new Size(strlen($placeholderData)),
+            new Width($width),
+            new Height($height),
+            BlurHashGenerator::generateBlurHash($img, $width, $height)
+        );
+        
+        $entity->setOutputFile($placeholderFile);
+        imagedestroy($img);
+
         // Set initial state as PROCESSING so it appears in archive
         $entity->setState(State::PROCESSING);
         error_log("APIFrame: Entity state set to PROCESSING, cost: " . $cost->value);
@@ -389,5 +411,50 @@ class ImageGeneratorService implements ImageServiceInterface
             error_log("APIFrame: Exception trace: " . $e->getTraceAsString());
             $entity->addMeta('apiframe_error', 'Failed to process image: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Create a placeholder image for processing state
+     */
+    private function createPlaceholderImage(string $prompt): string
+    {
+        // Create a 512x512 placeholder image
+        $width = 512;
+        $height = 512;
+        $image = imagecreatetruecolor($width, $height);
+        
+        // Set background color (light gray)
+        $bgColor = imagecolorallocate($image, 240, 240, 240);
+        imagefill($image, 0, 0, $bgColor);
+        
+        // Set text color (dark gray)
+        $textColor = imagecolorallocate($image, 100, 100, 100);
+        
+        // Add "Processing..." text
+        $text = "Processing...";
+        $font = 5; // Built-in font
+        $textWidth = imagefontwidth($font) * strlen($text);
+        $textHeight = imagefontheight($font);
+        $x = ($width - $textWidth) / 2;
+        $y = ($height - $textHeight) / 2 - 20;
+        imagestring($image, $font, (int)$x, (int)$y, $text, $textColor);
+        
+        // Add truncated prompt
+        $promptText = strlen($prompt) > 40 ? substr($prompt, 0, 37) . '...' : $prompt;
+        $promptWidth = imagefontwidth($font) * strlen($promptText);
+        $px = ($width - $promptWidth) / 2;
+        $py = $y + 30;
+        imagestring($image, $font, (int)$px, (int)$py, $promptText, $textColor);
+        
+        // Capture image as PNG
+        ob_start();
+        imagepng($image);
+        $imageData = ob_get_contents();
+        ob_end_clean();
+        
+        // Clean up
+        imagedestroy($image);
+        
+        return $imageData;
     }
 }
