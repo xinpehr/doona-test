@@ -77,16 +77,20 @@ class ImageGeneratorService implements ImageServiceInterface
 
         $card = $this->models[$model->value];
         
+        // Calculate cost
+        $cost = $this->calc->calculate(1, $model);
+
         $entity = new ImageEntity(
             $workspace,
             $user,
             $model,
             RequestParams::fromArray($params),
+            $cost
         );
-
+        
         // Set initial state as PROCESSING so it appears in archive
         $entity->setState(State::PROCESSING);
-        error_log("APIFrame: Entity state set to PROCESSING");
+        error_log("APIFrame: Entity state set to PROCESSING, cost: " . $cost->value);
 
         // Determine mode from model configuration
         $mode = 'fast'; // default
@@ -315,16 +319,16 @@ class ImageGeneratorService implements ImageServiceInterface
             
             error_log("APIFrame: Image downloaded successfully, size: " . strlen($imageData) . " bytes");
             
-            // Generate filename
+            // Generate proper CDN path
             $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
-            $filename = 'apiframe_' . $entity->getId()->getValue() . '.' . $extension;
+            $name = $this->cdn->generatePath($extension, $entity->getWorkspace(), $entity->getUser());
             
-            error_log("APIFrame: Generated filename: " . $filename);
+            error_log("APIFrame: Generated CDN path: " . $name);
             
             // Store in CDN
             try {
-                $this->cdn->write($filename, $imageData);
-                $cdnUrl = $this->cdn->getUrl($filename);
+                $this->cdn->write($name, $imageData);
+                $cdnUrl = $this->cdn->getUrl($name);
                 error_log("APIFrame: Image uploaded to CDN, URL: " . $cdnUrl);
             } catch (\Exception $e) {
                 error_log("APIFrame: CDN upload failed: " . $e->getMessage());
@@ -346,7 +350,7 @@ class ImageGeneratorService implements ImageServiceInterface
                 // Create ImageFileEntity
                 $file = new ImageFileEntity(
                     new Storage($this->cdn->getAdapterLookupKey()),
-                    new ObjectKey($filename),
+                    new ObjectKey($name),
                     new Url($cdnUrl),
                     new Size(strlen($imageData)),
                     new Width($width),
