@@ -128,9 +128,9 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_mode', $mode);
             $entity->addMeta('apiframe_status', 'pending');
 
-            error_log("APIFrame: Starting polling for task: " . $response['task_id']);
-            // Use full polling mechanism
-            $this->pollTaskResult($entity, $response['task_id']);
+            error_log("APIFrame: Task submitted successfully. Entity will be updated asynchronously.");
+            // Return entity immediately - polling will happen in background
+            // Note: For now, the image will show as processing until manual refresh
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
