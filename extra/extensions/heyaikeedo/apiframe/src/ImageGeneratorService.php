@@ -155,9 +155,15 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_prompt', $prompt);
             
             error_log("APIFrame: Entity created in PROCESSING state with task_id: " . $taskId);
-            error_log("APIFrame: Entity will be processed by background system");
             
-            // Return entity immediately so it shows in library
+            // Try to poll for quick completion (hybrid approach)
+            try {
+                $this->quickPollForCompletion($entity, $taskId);
+            } catch (\Exception $e) {
+                error_log("APIFrame: Quick polling failed, leaving for background: " . $e->getMessage());
+            }
+            
+            error_log("APIFrame: Returning entity - State: " . $entity->getState()->value);
             return $entity;
 
         } catch (\Exception $e) {
@@ -167,7 +173,69 @@ class ImageGeneratorService implements ImageServiceInterface
     }
 
     /**
-     * Poll the APIFrame API until task completion
+     * Quick poll for immediate completion (hybrid approach)
+     * Polls for up to 30 seconds, then leaves for background processing
+     */
+    private function quickPollForCompletion(ImageEntity $entity, string $taskId): void
+    {
+        $maxQuickAttempts = 6; // 30 seconds at 5-second intervals
+        $attempts = 0;
+        
+        error_log("APIFrame: Starting quick poll for task: " . $taskId);
+        
+        while ($attempts < $maxQuickAttempts) {
+            $attempts++;
+            
+            try {
+                $result = $this->client->fetch($taskId);
+                
+                if (!isset($result['status'])) {
+                    sleep(5);
+                    continue;
+                }
+                
+                $status = $result['status'];
+                error_log("APIFrame: Quick poll attempt {$attempts}, status: " . $status);
+                
+                switch ($status) {
+                    case 'completed':
+                    case 'finished':
+                        error_log("APIFrame: Quick poll - Task completed! Processing image...");
+                        $this->handleCompletedTask($entity, $result);
+                        return; // Success - task completed quickly
+                        
+                    case 'failed':
+                    case 'error':
+                        error_log("APIFrame: Quick poll - Task failed");
+                        $this->handleFailedTask($entity, $result);
+                        return;
+                        
+                    default:
+                        // Still processing - update progress if available
+                        $progress = $result['percentage'] ?? 0;
+                        if ($progress && is_numeric($progress)) {
+                            $entity->setProgress(new \Ai\Domain\ValueObjects\Progress((int) $progress));
+                            error_log("APIFrame: Quick poll - Progress: " . $progress . "%");
+                        }
+                        
+                        if ($attempts < $maxQuickAttempts) {
+                            sleep(5); // Wait 5 seconds before next poll
+                        }
+                        break;
+                }
+                
+            } catch (\Exception $e) {
+                error_log("APIFrame: Quick poll error: " . $e->getMessage());
+                break; // Stop quick polling on error
+            }
+        }
+        
+        // If we get here, task is taking longer - leave for background processing
+        error_log("APIFrame: Quick poll timeout - leaving task for background processing");
+    }
+
+    /**
+     * Poll the APIFrame API until task completion (legacy method for background)
      */
     private function pollTaskUntilCompletion(string $taskId, ImageEntity $entity): string
     {
