@@ -20,7 +20,7 @@ use File\Domain\ValueObjects\Size;
 use File\Domain\ValueObjects\Storage;
 use File\Domain\ValueObjects\Url;
 use File\Domain\ValueObjects\Width;
-use File\Infrastructure\BlurHashGenerator;
+use File\Infrastructure\BlurhashGenerator;
 use Override;
 use Shared\Infrastructure\FileSystem\CdnInterface;
 use Shared\Infrastructure\Services\ModelRegistry;
@@ -282,45 +282,12 @@ class ImageGeneratorService implements ImageServiceInterface
             
             error_log("APIFrame: Image downloaded, size: " . strlen($imageData) . " bytes");
             
-            // Create image resource for dimensions
-            $img = imagecreatefromstring($imageData);
-            if ($img === false) {
-                throw new \Exception('Invalid image data');
-            }
-            
-            $width = imagesx($img);
-            $height = imagesy($img);
-            error_log("APIFrame: Image dimensions: {$width}x{$height}");
-            
-            // Generate CDN path
-            $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
-            $name = $this->cdn->generatePath($extension, $entity->getWorkspace(), $entity->getUser());
-            
-            // Upload to CDN
-            $this->cdn->write($name, $imageData);
-            $cdnUrl = $this->cdn->getUrl($name);
-            error_log("APIFrame: Image uploaded to CDN: " . $cdnUrl);
-            
-            // Generate blur hash
-            $blurHashGenerator = new BlurHashGenerator();
-            $blurHash = $blurHashGenerator->generateBlurHash($img, $width, $height);
-            
-            // Create ImageFileEntity
-            $file = new ImageFileEntity(
-                new Storage($this->cdn->getAdapterLookupKey()),
-                new ObjectKey($name),
-                new Url($cdnUrl),
-                new Size(strlen($imageData)),
-                new Width($width),
-                new Height($height),
-                new BlurHash($blurHash)
-            );
+            // Save image using same pattern as other services
+            $file = $this->saveImage($imageData, $entity->getWorkspace(), $entity->getUser());
             
             // Complete the entity
             $entity->setOutputFile($file);
             $entity->setState(State::COMPLETED);
-            
-            imagedestroy($img);
             
             error_log("APIFrame: Image processing completed successfully");
             
@@ -329,6 +296,46 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->setState(State::FAILED);
             throw new DomainException('Image processing failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Save image content to CDN and return ImageFileEntity
+     */
+    private function saveImage(
+        string $content,
+        WorkspaceEntity $workspace,
+        UserEntity $user
+    ): ImageFileEntity {
+        // Generate CDN path
+        $name = $this->cdn->generatePath('png', $workspace, $user);
+        
+        // Upload to CDN
+        $this->cdn->write($name, $content);
+        
+        // Create image resource for dimensions
+        $img = imagecreatefromstring($content);
+        if ($img === false) {
+            throw new \Exception('Invalid image data');
+        }
+        
+        $width = imagesx($img);
+        $height = imagesy($img);
+        
+        error_log("APIFrame: Image dimensions: {$width}x{$height}");
+        error_log("APIFrame: Image uploaded to CDN: " . $this->cdn->getUrl($name));
+        
+        $file = new ImageFileEntity(
+            new Storage($this->cdn->getAdapterLookupKey()),
+            new ObjectKey($name),
+            new Url($this->cdn->getUrl($name)),
+            new Size(strlen($content)),
+            new Width($width),
+            new Height($height),
+            BlurhashGenerator::generateBlurHash($img, $width, $height),
+        );
+        
+        imagedestroy($img);
+        return $file;
     }
 
     #[Override]
