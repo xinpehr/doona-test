@@ -62,7 +62,7 @@ class ImageGeneratorService implements ImageServiceInterface
         Model $model,
         ?array $params = null
     ): ImageEntity {
-        error_log("APIFrame: Starting synchronous image generation with model: " . $model->value);
+        error_log("APIFrame: Starting async image generation with model: " . $model->value);
         error_log("APIFrame: Received params: " . json_encode($params));
         
         if (!$params || !array_key_exists('prompt', $params)) {
@@ -136,7 +136,7 @@ class ImageGeneratorService implements ImageServiceInterface
             $taskId = $response['task_id'];
             error_log("APIFrame: Task submitted successfully, task_id: " . $taskId);
 
-            // Create entity in processing state
+            // Create entity immediately in processing state
             $entity = new ImageEntity(
                 $workspace,
                 $user,
@@ -146,15 +146,18 @@ class ImageGeneratorService implements ImageServiceInterface
             );
             
             $entity->setState(State::PROCESSING);
-            error_log("APIFrame: Entity created in PROCESSING state");
-
-            // Start synchronous polling
-            $imageUrl = $this->pollTaskUntilCompletion($taskId, $entity);
             
-            // Process the completed image
-            $this->processImageFromUrl($entity, $imageUrl);
+            // Store task information in entity metadata for background processing
+            $entity->addMeta('apiframe_task_id', $taskId);
+            $entity->addMeta('apiframe_mode', $mode);
+            $entity->addMeta('apiframe_status', 'pending');
+            $entity->addMeta('apiframe_created_at', time());
+            $entity->addMeta('apiframe_prompt', $prompt);
             
-            error_log("APIFrame: Image generation completed successfully");
+            error_log("APIFrame: Entity created in PROCESSING state with task_id: " . $taskId);
+            error_log("APIFrame: Entity will be processed by background system");
+            
+            // Return entity immediately so it shows in library
             return $entity;
 
         } catch (\Exception $e) {
@@ -353,6 +356,97 @@ class ImageGeneratorService implements ImageServiceInterface
         foreach ($this->models as $key => $model) {
             yield new Model($key);
         }
+    }
+
+    /**
+     * Public method for background processing to check task status
+     */
+    public function checkTaskStatus(ImageEntity $entity): void
+    {
+        $taskId = $entity->getMeta('apiframe_task_id');
+        if (!$taskId) {
+            error_log("APIFrame: No task ID found for entity: " . $entity->getId()->getValue());
+            return;
+        }
+
+        try {
+            $result = $this->client->fetch($taskId);
+            error_log("APIFrame: Background check - Task: " . $taskId . ", Response: " . json_encode($result));
+            
+            if (!isset($result['status'])) {
+                error_log("APIFrame: No status in response");
+                return;
+            }
+            
+            $status = $result['status'];
+            $entity->addMeta('apiframe_status', $status);
+            
+            switch ($status) {
+                case 'completed':
+                case 'finished':
+                    error_log("APIFrame: Background processing - Task completed!");
+                    $this->handleCompletedTask($entity, $result);
+                    break;
+                    
+                case 'failed':
+                case 'error':
+                    error_log("APIFrame: Background processing - Task failed!");
+                    $this->handleFailedTask($entity, $result);
+                    break;
+                    
+                case 'processing':
+                case 'pending':
+                case 'queued':
+                case 'staged':
+                case 'starting':
+                case 'submitted':
+                    $progress = $result['percentage'] ?? null;
+                    error_log("APIFrame: Background processing - Still processing... Progress: " . ($progress ?? 'unknown'));
+                    $entity->addMeta('apiframe_progress', $progress);
+                    
+                    // Set progress in entity for frontend display
+                    if ($progress !== null && is_numeric($progress)) {
+                        $entity->setProgress(new \Ai\Domain\ValueObjects\Progress((int) $progress));
+                    }
+                    break;
+                    
+                default:
+                    error_log("APIFrame: Background processing - Unknown status: " . $status);
+                    break;
+            }
+            
+        } catch (\Exception $e) {
+            error_log("APIFrame: Background processing error: " . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Handle completed task - exactly as per APIFrame docs
+     */
+    private function handleCompletedTask(ImageEntity $entity, array $result): void
+    {
+        error_log("APIFrame: Processing completed task...");
+        
+        try {
+            $imageUrl = $this->extractImageUrl($result);
+            $this->processImageFromUrl($entity, $imageUrl);
+        } catch (\Exception $e) {
+            error_log("APIFrame: Error handling completed task: " . $e->getMessage());
+            $entity->addMeta('apiframe_error', 'Image processing failed: ' . $e->getMessage());
+            $entity->setState(State::FAILED);
+        }
+    }
+    
+    /**
+     * Handle failed task
+     */
+    private function handleFailedTask(ImageEntity $entity, array $result): void
+    {
+        $error = $result['error'] ?? $result['message'] ?? 'Task failed';
+        error_log("APIFrame: Task failed with error: " . $error);
+        
+        $entity->addMeta('apiframe_error', $error);
+        $entity->setState(State::FAILED);
     }
 
     /**
