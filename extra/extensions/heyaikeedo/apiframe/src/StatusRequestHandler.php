@@ -20,13 +20,15 @@ use Shared\Infrastructure\CommandBus\Dispatcher;
 /**
  * Handle status check requests for APIFrame tasks
  */
-#[Route(path: '/apiframe/status/{id:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}', method: RequestMethod::GET)]
+#[Route(path: '/apiframe/status/{id}', method: RequestMethod::GET)]
 class StatusRequestHandler implements RequestHandlerInterface
 {
     public function __construct(
         private Dispatcher $dispatcher,
         private ImageGeneratorService $service,
-    ) {}
+    ) {
+        error_log("APIFrame StatusRequestHandler: Constructor called - handler is being instantiated");
+    }
 
     #[Override]
     public function handle(ServerRequestInterface $request): ResponseInterface

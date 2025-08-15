@@ -6,6 +6,7 @@ namespace Aikeedo\ApiFrame;
 
 use Ai\Infrastructure\Services\AiServiceFactory;
 use Easy\Router\Mapper\AttributeMapper;
+use Easy\Router\Mapper\SimpleMapper;
 use Override;
 use Plugin\Domain\Context;
 use Plugin\Domain\Hooks\ActivateHookInterface;
@@ -37,6 +38,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         private AttributeMapper $mapper,
         private AiServiceFactory $factory,
         private ModelRegistry $registry,
+        private SimpleMapper $simpleMapper,
     ) {}
 
     #[Override]
@@ -54,7 +56,22 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         // Add path to the router mapper to scan for routes 
         // in current directory (for webhook handling)
         $this->mapper->addPath(__DIR__);
+        $this->mapper->disableCaching(); // Force disable caching for development
         error_log("APIFrame Plugin: Added route path: " . __DIR__);
+        error_log("APIFrame Plugin: Disabled route caching");
+        
+        // List files in route directory for debugging
+        $files = glob(__DIR__ . '/*.php');
+        foreach ($files as $file) {
+            $filename = basename($file);
+            if (str_contains($filename, 'RequestHandler')) {
+                error_log("APIFrame Plugin: Found handler file: " . $filename);
+            }
+        }
+        
+        // Manually register StatusRequestHandler route using SimpleMapper as backup
+        $this->simpleMapper->map('GET', '/apiframe/status/{id}', StatusRequestHandler::class);
+        error_log("APIFrame Plugin: Manually registered StatusRequestHandler route with SimpleMapper");
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
