@@ -42,20 +42,27 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
     #[Override]
     public function boot(Context $context): void
     {
+        error_log("APIFrame Plugin: Starting boot process");
+        
         // Add template path to the TWIG loader to scan for view templates 
         // in current directory. The first argument is the path to the directory,
         // the second argument is the namespace to use in the template.
         $this->loader->addPath(__DIR__, 'apiframe');
+        $this->loader->addPath(__DIR__ . '/../views', 'apiframe');
+        error_log("APIFrame Plugin: Added template paths");
 
         // Add path to the router mapper to scan for routes 
         // in current directory (for webhook handling)
         $this->mapper->addPath(__DIR__);
+        error_log("APIFrame Plugin: Added route path: " . __DIR__);
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
+        error_log("APIFrame Plugin: Registered ImageGeneratorService");
 
         // Register APIFrame models in the registry immediately when plugin boots
         $this->registerModels();
+        error_log("APIFrame Plugin: Boot process completed");
     }
 
     #[Override]
@@ -77,6 +84,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
      */
     private function registerModels(): void
     {
+        error_log("APIFrame Plugin: Starting model registration");
         // Define APIFrame service configuration
         $apiFrameService = [
             'key' => 'apiframe',
@@ -308,6 +316,8 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
 
         // Save the updated registry
         $this->registry->save();
+        
+        error_log("APIFrame Plugin: Models registered successfully. Total services: " . count($directory));
     }
 
     /**
