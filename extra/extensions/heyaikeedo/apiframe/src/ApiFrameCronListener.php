@@ -11,8 +11,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Easy\Container\Attributes\Inject;
 use Override;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * APIFrame Background Processing Listener
@@ -20,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Processes pending APIFrame tasks via cron job.
  * Polls the APIFrame API for task completion and updates entities accordingly.
  */
-class CronListener implements EventSubscriberInterface
+class ApiFrameCronListener
 {
     public function __construct(
         private EntityManagerInterface $em,
@@ -33,15 +31,7 @@ class CronListener implements EventSubscriberInterface
         private ?string $apiKey = null,
     ) {}
 
-    #[Override]
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CronEvent::class => 'handleCron'
-        ];
-    }
-
-    public function handleCron(CronEvent $event): void
+    public function __invoke(CronEvent $event): void
     {
         if (!$this->isEnabled || !$this->apiKey) {
             return;
@@ -50,7 +40,7 @@ class CronListener implements EventSubscriberInterface
         error_log("APIFrame: Starting background processing cron job");
         
         try {
-            $this->processAPIFrameTasks();
+            $this->processApiFrameTasks();
         } catch (\Exception $e) {
             error_log("APIFrame: Cron job error: " . $e->getMessage());
         }
@@ -59,7 +49,7 @@ class CronListener implements EventSubscriberInterface
     /**
      * Process all pending APIFrame tasks
      */
-    private function processAPIFrameTasks(): void
+    private function processApiFrameTasks(): void
     {
         // Find all processing APIFrame entities
         $qb = $this->em->createQueryBuilder();

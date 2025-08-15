@@ -11,8 +11,6 @@ use Plugin\Domain\Hooks\ActivateHookInterface;
 use Plugin\Domain\Hooks\DeactivateHookInterface;
 use Plugin\Domain\PluginInterface;
 use Shared\Infrastructure\Services\ModelRegistry;
-use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * APIFrame Midjourney Plugin
@@ -29,14 +27,10 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
      *
      * @param AiServiceFactory $factory AI service factory for registering services
      * @param ModelRegistry $registry Model registry for registering models
-     * @param ContainerInterface $container Dependency injection container
-     * @param EventDispatcherInterface $dispatcher Event dispatcher for cron listener
      */
     public function __construct(
         private AiServiceFactory $factory,
         private ModelRegistry $registry,
-        private ContainerInterface $container,
-        private EventDispatcherInterface $dispatcher,
     ) {}
 
     #[Override]
@@ -48,18 +42,10 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         $this->factory->register(ImageGeneratorService::class);
         error_log("APIFrame Plugin: Registered ImageGeneratorService");
 
-        // Register background processing listener
-        $cronListener = $this->container->get(CronListener::class);
-        $this->dispatcher->addSubscriber($cronListener);
-        error_log("APIFrame Plugin: Registered CronListener for background processing");
-
         // Register APIFrame models in the registry immediately when plugin boots
         $this->registerModels();
         
-        // JavaScript progress monitoring is available at /e/heyaikeedo/apiframe/apiframe-progress.js
-        error_log("APIFrame Plugin: JavaScript progress monitoring available at /e/heyaikeedo/apiframe/apiframe-progress.js");
-        
-        error_log("APIFrame Plugin: Boot process completed");
+        error_log("APIFrame Plugin: Boot process completed - background processing will be handled by CronListener");
     }
 
     #[Override]
