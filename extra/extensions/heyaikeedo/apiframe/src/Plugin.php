@@ -62,21 +62,9 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         error_log("APIFrame Plugin: Added route path: " . __DIR__);
         error_log("APIFrame Plugin: Disabled route caching");
         
-        // List files in route directory for debugging
-        $files = glob(__DIR__ . '/*.php');
-        foreach ($files as $file) {
-            $filename = basename($file);
-            if (str_contains($filename, 'RequestHandler')) {
-                error_log("APIFrame Plugin: Found handler file: " . $filename);
-            }
-        }
-        
-        // Manually register StatusRequestHandler route using SimpleMapper as backup
-        $this->simpleMapper->map('GET', '/apiframe/status/{id}', function($request) {
-            $handler = $this->container->get(StatusRequestHandler::class);
-            return $handler->handle($request);
-        });
-        error_log("APIFrame Plugin: Manually registered StatusRequestHandler route with SimpleMapper closure");
+        // Override the standard library images handler with our APIFrame-aware version
+        $this->simpleMapper->map('GET', '/library/images/{id}', ApiFrameLibraryItemRequestHandler::class);
+        error_log("APIFrame Plugin: Registered APIFrame-aware library images handler");
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
