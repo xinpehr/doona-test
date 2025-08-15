@@ -156,11 +156,15 @@ class ImageGeneratorService implements ImageServiceInterface
             
             error_log("APIFrame: Entity created in PROCESSING state with task_id: " . $taskId);
             
-            // Try to poll for quick completion (hybrid approach)
+            // For development: poll until completion (since no DB/cron available)
             try {
-                $this->quickPollForCompletion($entity, $taskId);
+                error_log("APIFrame: Development mode - polling until completion");
+                $imageUrl = $this->pollTaskUntilCompletion($taskId, $entity);
+                $this->processImageFromUrl($entity, $imageUrl);
+                error_log("APIFrame: Development mode - task completed successfully");
             } catch (\Exception $e) {
-                error_log("APIFrame: Quick polling failed, leaving for background: " . $e->getMessage());
+                error_log("APIFrame: Development polling failed: " . $e->getMessage());
+                $entity->setState(State::FAILED);
             }
             
             error_log("APIFrame: Returning entity - State: " . $entity->getState()->value);
