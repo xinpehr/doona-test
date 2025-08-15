@@ -27,6 +27,7 @@ use Shared\Infrastructure\Services\ModelRegistry;
 use Traversable;
 use User\Domain\Entities\UserEntity;
 use Workspace\Domain\Entities\WorkspaceEntity;
+use Ai\Domain\ValueObjects\Progress;
 
 /**
  * APIFrame Midjourney Image Generator Service
@@ -157,11 +158,12 @@ class ImageGeneratorService implements ImageServiceInterface
             $entity->addMeta('apiframe_task_id', $response['task_id']);
             $entity->addMeta('apiframe_mode', $mode);
             $entity->addMeta('apiframe_status', 'pending');
+            $entity->addMeta('apiframe_created_at', time());
 
-            error_log("APIFrame: Task submitted successfully. Starting simple polling...");
+            error_log("APIFrame: Task submitted successfully. Entity ready for background processing");
             
-            // Start simple polling loop (blocking but with timeout)
-            $this->pollTask($entity, $response['task_id']);
+            // Entity stays in PROCESSING state for background polling
+            // Background job will handle the polling and completion
 
         } catch (\Exception $e) {
             error_log("APIFrame: Exception occurred: " . $e->getMessage());
@@ -170,15 +172,9 @@ class ImageGeneratorService implements ImageServiceInterface
             throw new DomainException('Failed to generate image: ' . $e->getMessage());
         }
 
-        error_log("APIFrame: About to return entity...");
-        error_log("APIFrame: Returning entity with ID: " . $entity->getId()->getValue());
-        error_log("APIFrame: Entity state: " . $entity->getState()->value);
-        error_log("APIFrame: Entity cost: " . $entity->getCost()->value);
-        error_log("APIFrame: Entity output file: " . ($entity->getOutputFile() ? 'SET' : 'NULL'));
-        error_log("APIFrame: Entity title: " . ($entity->getTitle()->value ?? 'NULL'));
-        error_log("APIFrame: Entity workspace: " . $entity->getWorkspace()->getId()->getValue());
-        error_log("APIFrame: Entity user: " . $entity->getUser()->getId()->getValue());
-        error_log("APIFrame: Successfully returning entity to command handler");
+        error_log("APIFrame: Returning entity in PROCESSING state for background processing");
+        error_log("APIFrame: Entity ID: " . $entity->getId()->getValue());
+        error_log("APIFrame: Task ID: " . $response['task_id']);
         
         return $entity;
     }
@@ -232,78 +228,65 @@ class ImageGeneratorService implements ImageServiceInterface
     }
 
     /**
-     * Simple polling method - exactly as per APIFrame docs
+     * Public method for background processing to check task status
      */
-    private function pollTask(ImageEntity $entity, string $taskId): void
+    public function checkTaskStatus(ImageEntity $entity): void
     {
-        error_log("APIFrame: Starting polling for task: " . $taskId);
-        
-        $maxAttempts = 24; // 2 minutes max (24 * 5 seconds)
-        $attempt = 0;
-        
-        while ($attempt < $maxAttempts) {
-            $attempt++;
-            
-            // Wait 5 seconds between polls (as recommended)
-            if ($attempt > 1) {
-                sleep(5);
-            }
-            
-            error_log("APIFrame: Polling attempt $attempt/$maxAttempts for task: " . $taskId);
-            
-            try {
-                // Call fetch API exactly as per docs
-                $result = $this->client->fetch($taskId);
-                error_log("APIFrame: Fetch response: " . json_encode($result));
-                
-                // Check status according to APIFrame docs
-                if (!isset($result['status'])) {
-                    error_log("APIFrame: No status in response, continuing...");
-                    continue;
-                }
-                
-                $status = $result['status'];
-                error_log("APIFrame: Task status: " . $status);
-                
-                // Handle different statuses
-                switch ($status) {
-                    case 'completed':
-                    case 'finished':
-                        error_log("APIFrame: Task completed! Processing result...");
-                        $this->handleCompletedTask($entity, $result);
-                        return; // Exit polling
-                        
-                    case 'failed':
-                    case 'error':
-                        error_log("APIFrame: Task failed!");
-                        $this->handleFailedTask($entity, $result);
-                        return; // Exit polling
-                        
-                    case 'processing':
-                    case 'pending':
-                    case 'queued':
-                    case 'staged':
-                    case 'submitted':
-                        $progress = $result['percentage'] ?? 'unknown';
-                        error_log("APIFrame: Task still processing... Progress: " . $progress);
-                        continue 2; // Continue polling loop
-                        
-                    default:
-                        error_log("APIFrame: Unknown status: " . $status . ", continuing...");
-                        continue 2; // Continue polling loop
-                }
-                
-            } catch (\Exception $e) {
-                error_log("APIFrame: Polling error (attempt $attempt): " . $e->getMessage());
-                // Continue polling even on error (might be temporary)
-                continue;
-            }
+        $taskId = $entity->getMeta('apiframe_task_id');
+        if (!$taskId) {
+            error_log("APIFrame: No task ID found for entity: " . $entity->getId()->getValue());
+            return;
         }
-        
-        // Timeout reached
-        error_log("APIFrame: Polling timeout reached for task: " . $taskId);
-        $entity->addMeta('apiframe_error', 'Polling timeout after 2 minutes');
-        $entity->setState(State::FAILED);
+
+        try {
+            $result = $this->client->fetch($taskId);
+            error_log("APIFrame: Background check - Task: " . $taskId . ", Response: " . json_encode($result));
+            
+            if (!isset($result['status'])) {
+                error_log("APIFrame: No status in response");
+                return;
+            }
+            
+            $status = $result['status'];
+            $entity->addMeta('apiframe_status', $status);
+            
+            switch ($status) {
+                case 'completed':
+                case 'finished':
+                    error_log("APIFrame: Background processing - Task completed!");
+                    $this->handleCompletedTask($entity, $result);
+                    break;
+                    
+                case 'failed':
+                case 'error':
+                    error_log("APIFrame: Background processing - Task failed!");
+                    $this->handleFailedTask($entity, $result);
+                    break;
+                    
+                case 'processing':
+                case 'pending':
+                case 'queued':
+                case 'staged':
+                case 'starting':
+                case 'submitted':
+                    $progress = $result['percentage'] ?? null;
+                    error_log("APIFrame: Background processing - Still processing... Progress: " . ($progress ?? 'unknown'));
+                    $entity->addMeta('apiframe_progress', $progress);
+                    
+                    // Set progress in entity for frontend display
+                    if ($progress !== null && is_numeric($progress)) {
+                        $entity->setProgress(new Progress((int) $progress));
+                    }
+                    break;
+                    
+                default:
+                    error_log("APIFrame: Background processing - Unknown status: " . $status);
+                    break;
+            }
+            
+        } catch (\Exception $e) {
+            error_log("APIFrame: Background processing error: " . $e->getMessage());
+        }
     }
     
     /**
