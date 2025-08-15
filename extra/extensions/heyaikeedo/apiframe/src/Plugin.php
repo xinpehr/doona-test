@@ -8,6 +8,7 @@ use Ai\Infrastructure\Services\AiServiceFactory;
 use Easy\Router\Mapper\AttributeMapper;
 use Easy\Router\Mapper\SimpleMapper;
 use Override;
+use Psr\Container\ContainerInterface;
 use Plugin\Domain\Context;
 use Plugin\Domain\Hooks\ActivateHookInterface;
 use Plugin\Domain\Hooks\DeactivateHookInterface;
@@ -39,6 +40,7 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         private AiServiceFactory $factory,
         private ModelRegistry $registry,
         private SimpleMapper $simpleMapper,
+        private ContainerInterface $container,
     ) {}
 
     #[Override]
@@ -70,8 +72,11 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         }
         
         // Manually register StatusRequestHandler route using SimpleMapper as backup
-        $this->simpleMapper->map('GET', '/apiframe/status/{id}', StatusRequestHandler::class);
-        error_log("APIFrame Plugin: Manually registered StatusRequestHandler route with SimpleMapper");
+        $this->simpleMapper->map('GET', '/apiframe/status/{id}', function($request) {
+            $handler = $this->container->get(StatusRequestHandler::class);
+            return $handler->handle($request);
+        });
+        error_log("APIFrame Plugin: Manually registered StatusRequestHandler route with SimpleMapper closure");
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
