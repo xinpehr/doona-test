@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace Aikeedo\ApiFrame;
 
 use Ai\Infrastructure\Services\AiServiceFactory;
-use Easy\Router\Mapper\AttributeMapper;
-use Easy\Router\Mapper\SimpleMapper;
 use Override;
-use Psr\Container\ContainerInterface;
-use Shared\Infrastructure\BootstrapperInterface;
 use Plugin\Domain\Context;
 use Plugin\Domain\Hooks\ActivateHookInterface;
 use Plugin\Domain\Hooks\DeactivateHookInterface;
 use Plugin\Domain\PluginInterface;
 use Shared\Infrastructure\Services\ModelRegistry;
-use Twig\Loader\FilesystemLoader;
 
 /**
  * APIFrame Midjourney Plugin
@@ -30,54 +25,18 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
     /**
      * Plugin constructor. Inject required dependencies for the plugin.
      *
-     * @param FilesystemLoader $loader TWIG loader for templates
-     * @param AttributeMapper $mapper Route mapper for webhook endpoints
      * @param AiServiceFactory $factory AI service factory for registering services
      * @param ModelRegistry $registry Model registry for registering models
      */
     public function __construct(
-        private FilesystemLoader $loader,
-        private AttributeMapper $mapper,
         private AiServiceFactory $factory,
         private ModelRegistry $registry,
-        private SimpleMapper $simpleMapper,
-        private ContainerInterface $container,
     ) {}
 
     #[Override]
     public function boot(Context $context): void
     {
-        error_log("APIFrame Plugin: Starting boot process");
-        
-        // Add template path to the TWIG loader to scan for view templates 
-        // in current directory. The first argument is the path to the directory,
-        // the second argument is the namespace to use in the template.
-        $this->loader->addPath(__DIR__, 'apiframe');
-        $this->loader->addPath(__DIR__ . '/../views', 'apiframe');
-        error_log("APIFrame Plugin: Added template paths");
-
-        // Add path to the router mapper to scan for routes 
-        // in current directory (for webhook handling)
-        $this->mapper->addPath(__DIR__);
-        $this->mapper->disableCaching(); // Force disable caching for development
-        error_log("APIFrame Plugin: Added route path: " . __DIR__);
-        error_log("APIFrame Plugin: Disabled route caching");
-        
-        // For now, use manual JavaScript loading for polling
-        // The JavaScript file is available at: /e/heyaikeedo/apiframe/polling.js
-        error_log("APIFrame Plugin: JavaScript polling available at /e/heyaikeedo/apiframe/polling.js");
-        
-        // Manually register StatusRequestHandler route to ensure it's available
-        try {
-            $this->mapper->addRoute(
-                'GET',
-                '/apiframe/status/{id}',
-                StatusRequestHandler::class
-            );
-            error_log("APIFrame Plugin: Manually registered status route");
-        } catch (\Exception $e) {
-            error_log("APIFrame Plugin: Failed to register status route: " . $e->getMessage());
-        }
+        error_log("APIFrame Plugin: Starting boot process (synchronous mode)");
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
