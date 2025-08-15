@@ -35,31 +35,42 @@ class ApiFrameLibraryItemRequestHandler implements RequestHandlerInterface
     #[Override]
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = $request->getAttribute('id');
-        error_log("APIFrame ApiFrameLibraryItemRequestHandler: Handling request for ID: " . $id);
-
-        // Find library item by id
-        $cmd = new ReadLibraryItemCommand($id);
-
         try {
-            /** @var ImageEntity $entity */
-            $entity = $this->dispatcher->dispatch($cmd);
-            error_log("APIFrame ApiFrameLibraryItemRequestHandler: Entity found, current state: " . $entity->getState()->value);
-        } catch (LibraryItemNotFoundException $th) {
-            error_log("APIFrame ApiFrameLibraryItemRequestHandler: Entity not found: " . $id);
-            throw new NotFoundException();
-        }
+            $id = $request->getAttribute('id');
+            error_log("APIFrame ApiFrameLibraryItemRequestHandler: Handling request for ID: " . $id);
 
-        // Check if this is an APIFrame entity and update status if needed
-        $taskId = $entity->getMeta('apiframe_task_id');
-        if ($taskId) {
-            error_log("APIFrame ApiFrameLibraryItemRequestHandler: Found APIFrame task, checking status for: " . $taskId);
-            $this->service->checkTaskStatus($entity);
-            error_log("APIFrame ApiFrameLibraryItemRequestHandler: Status check completed");
-        }
+            // Find library item by id
+            $cmd = new ReadLibraryItemCommand($id);
 
-        // Return the entity as ImageResource (same as original handler)
-        $resource = new ImageResource($entity);
-        return new JsonResponse($resource);
+            try {
+                /** @var ImageEntity $entity */
+                $entity = $this->dispatcher->dispatch($cmd);
+                error_log("APIFrame ApiFrameLibraryItemRequestHandler: Entity found, current state: " . $entity->getState()->value);
+            } catch (LibraryItemNotFoundException $th) {
+                error_log("APIFrame ApiFrameLibraryItemRequestHandler: Entity not found: " . $id);
+                throw new NotFoundException();
+            }
+
+            // Check if this is an APIFrame entity and update status if needed
+            $taskId = $entity->getMeta('apiframe_task_id');
+            if ($taskId) {
+                error_log("APIFrame ApiFrameLibraryItemRequestHandler: Found APIFrame task, checking status for: " . $taskId);
+                try {
+                    $this->service->checkTaskStatus($entity);
+                    error_log("APIFrame ApiFrameLibraryItemRequestHandler: Status check completed");
+                } catch (\Exception $e) {
+                    error_log("APIFrame ApiFrameLibraryItemRequestHandler: Error in checkTaskStatus: " . $e->getMessage());
+                }
+            }
+
+            // Return the entity as ImageResource (same as original handler)
+            $resource = new ImageResource($entity);
+            return new JsonResponse($resource);
+            
+        } catch (\Exception $e) {
+            error_log("APIFrame ApiFrameLibraryItemRequestHandler: Fatal error: " . $e->getMessage());
+            error_log("APIFrame ApiFrameLibraryItemRequestHandler: Stack trace: " . $e->getTraceAsString());
+            throw $e;
+        }
     }
 }
