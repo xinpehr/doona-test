@@ -66,6 +66,18 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         // For now, use manual JavaScript loading for polling
         // The JavaScript file is available at: /e/heyaikeedo/apiframe/polling.js
         error_log("APIFrame Plugin: JavaScript polling available at /e/heyaikeedo/apiframe/polling.js");
+        
+        // Manually register StatusRequestHandler route to ensure it's available
+        try {
+            $this->mapper->addRoute(
+                'GET',
+                '/apiframe/status/{id}',
+                StatusRequestHandler::class
+            );
+            error_log("APIFrame Plugin: Manually registered status route");
+        } catch (\Exception $e) {
+            error_log("APIFrame Plugin: Failed to register status route: " . $e->getMessage());
+        }
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
