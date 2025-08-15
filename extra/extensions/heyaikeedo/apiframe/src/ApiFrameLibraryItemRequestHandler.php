@@ -22,7 +22,7 @@ use Shared\Infrastructure\CommandBus\Dispatcher;
  * Override library item handler specifically for APIFrame entities
  * This handles polling for APIFrame tasks by checking status before returning entity
  */
-#[Route(path: '/library/images/{id}', method: RequestMethod::GET)]
+#[Route(path: '/api/library/images/{id}', method: RequestMethod::GET)]
 class ApiFrameLibraryItemRequestHandler implements RequestHandlerInterface
 {
     public function __construct(

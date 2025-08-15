@@ -63,8 +63,8 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         error_log("APIFrame Plugin: Disabled route caching");
         
         // Override the standard library images handler with our APIFrame-aware version
-        $this->simpleMapper->map('GET', '/library/images/{id}', ApiFrameLibraryItemRequestHandler::class);
-        error_log("APIFrame Plugin: Registered APIFrame-aware library images handler");
+        $this->simpleMapper->map('GET', '/api/library/images/{id}', ApiFrameLibraryItemRequestHandler::class);
+        error_log("APIFrame Plugin: Registered APIFrame-aware library images handler with /api prefix");
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
