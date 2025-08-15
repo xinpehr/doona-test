@@ -9,6 +9,7 @@ use Easy\Router\Mapper\AttributeMapper;
 use Easy\Router\Mapper\SimpleMapper;
 use Override;
 use Psr\Container\ContainerInterface;
+use Shared\Infrastructure\BootstrapperInterface;
 use Plugin\Domain\Context;
 use Plugin\Domain\Hooks\ActivateHookInterface;
 use Plugin\Domain\Hooks\DeactivateHookInterface;
