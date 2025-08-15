@@ -63,9 +63,9 @@ class Plugin implements PluginInterface, ActivateHookInterface, DeactivateHookIn
         error_log("APIFrame Plugin: Added route path: " . __DIR__);
         error_log("APIFrame Plugin: Disabled route caching");
         
-        // Override the standard library images handler with our APIFrame-aware version
-        $this->simpleMapper->map('GET', '/api/library/images/{id}', ApiFrameLibraryItemRequestHandler::class);
-        error_log("APIFrame Plugin: Registered APIFrame-aware library images handler with /api prefix");
+        // For now, use manual JavaScript loading for polling
+        // The JavaScript file is available at: /e/heyaikeedo/apiframe/polling.js
+        error_log("APIFrame Plugin: JavaScript polling available at /e/heyaikeedo/apiframe/polling.js");
 
         // Register the APIFrame image generation service
         $this->factory->register(ImageGeneratorService::class);
